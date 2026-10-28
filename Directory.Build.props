@@ -1,0 +1,16 @@
+<Project>
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- Roslyn only runs IDE0005 (unnecessary usings) on build when XML docs are generated
+         (https://github.com/dotnet/roslyn/issues/41640). This is an app, not a library, so
+         CS1591 (missing XML comment on public members) is off rather than forcing doc comments. -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
+  </PropertyGroup>
+
+</Project>
