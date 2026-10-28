@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\QualiTrack.Domain\QualiTrack.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

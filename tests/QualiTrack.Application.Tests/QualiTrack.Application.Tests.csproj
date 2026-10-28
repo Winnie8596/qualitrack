@@ -18,4 +18,8 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\QualiTrack.Application\QualiTrack.Application.csproj" />
+  </ItemGroup>
+
 </Project>
