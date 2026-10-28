@@ -130,14 +130,13 @@ Each rule must have at least one unit test named after the behaviour.
 | Code quality | Nullable enabled, warnings as errors, analyzers on, formatter clean. Follows the clean code checklist in `plan.md`. |
 | Errors | API errors use RFC 9457 ProblemDetails. Domain rule violations map to `409 Conflict` or `422`; validation to `400`. |
 | Security | ASP.NET Core Identity, cookie auth, role-based authorization on every endpoint. No secrets in the repo. |
-| Observability | Structured logs with a correlation ID per request. `/health` endpoint. |
+| Observability | Structured logs with a correlation ID per request; OpenTelemetry traces and metrics; `/health` endpoint with uptime monitoring. |
 | Performance | NCR list responds in < 500 ms for 10,000 NCRs (paged, indexed). |
 | Accessibility | Forms labelled, keyboard usable, colour not the only status signal. |
 | Time | All timestamps stored as UTC `DateTimeOffset`; displayed in Asia/Kuala_Lumpur. The domain never reads the system clock directly. |
 | Web security | OWASP Top 10 reviewed; CSRF protection on cookie-authenticated writes; security headers; login rate-limited |
 | Frontend quality | Responsive from 375 px; Lighthouse performance and accessibility ≥ 90 on main pages |
 | Caching | Dashboard served from Redis cache with database fallback |
-| Observability | OpenTelemetry traces and metrics; uptime monitoring on `/health` |
 
 ## 9. Tech stack (fixed)
 

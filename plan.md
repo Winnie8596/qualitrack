@@ -123,7 +123,7 @@ qualitrack/
 ├─ docker-compose.yml · .env.example · Directory.Build.props · QualiTrack.slnx · README.md
 ```
 
-**Done when:** CI green on both jobs; page shows "healthy" locally.
+**Done when:** CI green on both jobs; `main` requires green CI to merge; page shows "healthy" locally.
 
 ---
 
@@ -204,7 +204,7 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [ ] `docs/learning/owasp-top-10.md`: each OWASP Top 10 item, and where QualiTrack defends against it (or why it doesn't apply)
 - [ ] ADR 0006 must compare cookie sessions with JWT (storage, CSRF/XSS exposure, revocation)
 
-**Done when:** full lifecycle integration test passes; OpenAPI document lists every endpoint.
+**Done when:** full lifecycle integration test passes; OpenAPI document lists every endpoint; writes without an antiforgery token are rejected; security headers are present on every response; login is rate-limited.
 
 ---
 
@@ -220,7 +220,7 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [ ] Semantic HTML and accessibility: every input labelled, keyboard-only lifecycle run, axe/Lighthouse accessibility score ≥ 90
 - [ ] Lighthouse performance score ≥ 90 on the NCR list page; route-level code splitting
 
-**Done when:** a reviewer can run the whole lifecycle in the browser with the three demo users.
+**Done when:** a reviewer can run the whole lifecycle in the browser with the three demo users; Lighthouse performance and accessibility are ≥ 90 on the NCR list page; layout works at 375 px.
 
 ---
 
@@ -234,7 +234,7 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [ ] Redis in `docker-compose.yml`; cache dashboard results with `IDistributedCache` (cache-aside, 60 s TTL, invalidated when an NCR changes status); falls back to the database if Redis is down
 - [ ] OpenTelemetry tracing and metrics for API + EF Core; request duration visible locally
 
-**Done when:** `docker compose up` starts a working app from a clean clone.
+**Done when:** `docker compose up` starts a working app from a clean clone; the dashboard still loads with Redis stopped; API traces and request durations are visible locally.
 
 ---
 
@@ -259,4 +259,4 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [ ] Uptime check on `/health` with an alert email
 - [ ] `docs/learning/cloud-mapping.md`: owner's notes mapping each Azure resource used to its AWS equivalent
 
-**Done when:** PRD §10 success criteria are all met.
+**Done when:** PRD §10 success criteria are all met; the `/health` uptime alert is live. The Terraform stretch task is not required.
