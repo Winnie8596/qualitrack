@@ -103,7 +103,7 @@ Goal: browser → API → CI, end to end, with no features.
 - [x] Create projects: `QualiTrack.Domain`, `.Application`, `.Infrastructure`, `.Api`, `tests/QualiTrack.Domain.Tests`, `tests/QualiTrack.Application.Tests`, `tests/QualiTrack.Api.IntegrationTests`; delete template sample files
 - [x] Add project references exactly as in "Architecture rules"
 - [x] `Directory.Build.props`: `Nullable=enable`, `ImplicitUsings=enable`, `TreatWarningsAsErrors=true`, `AnalysisLevel=latest`, `EnforceCodeStyleInBuild=true`
-- [ ] Api: `/health` via `AddHealthChecks`, OpenAPI in Development, `public partial class Program { }`
+- [x] Api: `/health` via `AddHealthChecks`, OpenAPI in Development (no `public partial class Program { }`: .NET 10 makes `Program` public for `WebApplicationFactory`; ASP0027)
 - [ ] Integration test: `Health_returns_200_when_the_app_starts`
 - [ ] `web/`: Vite React TS app showing "API status: healthy | unreachable" from `/health` via dev proxy
 - [ ] `docker-compose.yml` with PostgreSQL 17 (named volume, credentials from `.env`, `.env.example` committed)
