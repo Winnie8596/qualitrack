@@ -65,7 +65,7 @@ src/QualiTrack.Api             → references Application + Infrastructure (comp
 Goal: browser → API → CI, end to end, with no features.
 
 - [x] Create repo layout per `PRD.md` §9 and the tree below; `.gitignore`, `.editorconfig`, `QualiTrack.slnx`
-- [ ] Create projects: `QualiTrack.Domain`, `.Application`, `.Infrastructure`, `.Api`, `tests/QualiTrack.Domain.Tests`, `tests/QualiTrack.Application.Tests`, `tests/QualiTrack.Api.IntegrationTests`; delete template sample files
+- [x] Create projects: `QualiTrack.Domain`, `.Application`, `.Infrastructure`, `.Api`, `tests/QualiTrack.Domain.Tests`, `tests/QualiTrack.Application.Tests`, `tests/QualiTrack.Api.IntegrationTests`; delete template sample files
 - [ ] Add project references exactly as in "Architecture rules"
 - [ ] `Directory.Build.props`: `Nullable=enable`, `ImplicitUsings=enable`, `TreatWarningsAsErrors=true`, `AnalysisLevel=latest`, `EnforceCodeStyleInBuild=true`
 - [ ] Api: `/health` via `AddHealthChecks`, OpenAPI in Development, `public partial class Program { }`

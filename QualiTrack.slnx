@@ -1,2 +1,13 @@
 <Solution>
+  <Folder Name="/src/">
+    <Project Path="src/QualiTrack.Api/QualiTrack.Api.csproj" />
+    <Project Path="src/QualiTrack.Application/QualiTrack.Application.csproj" />
+    <Project Path="src/QualiTrack.Domain/QualiTrack.Domain.csproj" />
+    <Project Path="src/QualiTrack.Infrastructure/QualiTrack.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/QualiTrack.Api.IntegrationTests/QualiTrack.Api.IntegrationTests.csproj" />
+    <Project Path="tests/QualiTrack.Application.Tests/QualiTrack.Application.Tests.csproj" />
+    <Project Path="tests/QualiTrack.Domain.Tests/QualiTrack.Domain.Tests.csproj" />
+  </Folder>
 </Solution>
