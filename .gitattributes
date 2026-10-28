@@ -1,0 +1,15 @@
+# Normalise text to LF in the repo and working tree, regardless of core.autocrlf,
+# so Windows checkouts match the Linux CI runner and .editorconfig (end_of_line = lf).
+* text=auto eol=lf
+
+# Windows scripts need CRLF to run correctly
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary files: no line-ending conversion or text diffs
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
