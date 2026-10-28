@@ -31,6 +31,7 @@ In many small companies NCRs live in Excel sheets, WhatsApp photos and paper for
 | G3 | Keep a complete, read-only audit trail per NCR |
 | G4 | Show managers what is open, critical and overdue at a glance |
 | G5 | Demonstrate clean code, clean architecture and automated testing |
+| G6 | Practise every core topic of the roadmap.sh full-stack roadmap, with notes in `docs/learning/` that the owner can explain in an interview |
 
 ### Non-goals (v1)
 
@@ -133,6 +134,10 @@ Each rule must have at least one unit test named after the behaviour.
 | Performance | NCR list responds in < 500 ms for 10,000 NCRs (paged, indexed). |
 | Accessibility | Forms labelled, keyboard usable, colour not the only status signal. |
 | Time | All timestamps stored as UTC `DateTimeOffset`; displayed in Asia/Kuala_Lumpur. The domain never reads the system clock directly. |
+| Web security | OWASP Top 10 reviewed; CSRF protection on cookie-authenticated writes; security headers; login rate-limited |
+| Frontend quality | Responsive from 375 px; Lighthouse performance and accessibility ≥ 90 on main pages |
+| Caching | Dashboard served from Redis cache with database fallback |
+| Observability | OpenTelemetry traces and metrics; uptime monitoring on `/health` |
 
 ## 9. Tech stack (fixed)
 
@@ -141,6 +146,10 @@ Each rule must have at least one unit test named after the behaviour.
 - Frontend: React + TypeScript (Vite), TanStack Query, React Hook Form + Zod
 - Tests: xUnit, Testcontainers, `Microsoft.AspNetCore.Mvc.Testing`
 - CI/CD: GitHub Actions; deploy to Azure Container Apps
+- Styling: Tailwind CSS
+- Cache: Redis (via `IDistributedCache`)
+- Observability: OpenTelemetry
+- Infrastructure as Code (stretch): Terraform
 
 Do not add other frameworks or libraries (MediatR, AutoMapper, FluentAssertions, Redux, UI kits, etc.) without an ADR approved by the owner.
 

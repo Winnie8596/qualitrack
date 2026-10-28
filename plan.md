@@ -60,6 +60,41 @@ src/QualiTrack.Api             → references Application + Infrastructure (comp
 
 ---
 
+## Full-stack learning map
+
+Source: roadmap.sh/full-stack (2026). The roadmap's reference stack is Node.js + AWS. QualiTrack keeps .NET + Azure (fixed in `PRD.md` §9). Each roadmap topic is covered by its QualiTrack equivalent, and the concepts transfer to any stack.
+
+> Each roadmap topic, where QualiTrack practises it, and what the owner must be able to explain afterwards. When a task touches a topic, the agent's explanation must cover the "Explain it" column.
+
+| Roadmap topic | QualiTrack equivalent | Phase | Explain it (owner, in an interview) |
+| --- | --- | --- | --- |
+| How the web works: HTTP, DNS, browsers | API requests, cookies, CORS, deployment domain | 0, 4, 8 | What happens from typing the URL to seeing the NCR list; status codes; headers; HTTPS |
+| HTML | Semantic markup for forms, tables, nav | 5 | Why `<button>` not `<div onClick>`; labels; landmarks |
+| CSS | Layout with Flexbox/Grid, responsive pages | 5 | Box model, specificity, mobile-first, media queries |
+| Tailwind CSS | Utility-first styling for the web app | 5 | Trade-offs vs plain CSS / component libraries |
+| JavaScript | Async/await, fetch, modules, closures in React code | 0, 5 | Event loop, promises, `this`, equality, array methods |
+| TypeScript | Strict typed web app and API types | 0, 5 | Union types, generics, narrowing, why no `any` |
+| npm | `web/` dependencies, scripts, lockfile | 0, 5 | `npm ci` vs `npm install`, semver, lockfiles |
+| Git | Small commits, branches, rebase, `.gitattributes` | all | Merge vs rebase, resolving conflicts, reverting a bad commit |
+| GitHub | PRs, issues, protected `main`, Actions | all | Pull request workflow and code review etiquette |
+| React | Components, hooks, routing, forms, server state | 5 | State vs props, effects, re-renders, keys, controlled inputs |
+| Node.js (backend) | ASP.NET Core Web API (same role) | 2–4 | Request pipeline, middleware, dependency injection |
+| RESTful APIs | `/api/ncrs` resources, ProblemDetails, paging | 4 | Resource naming, verbs, idempotency, status codes, pagination |
+| Authentication (JWT) | Cookie auth chosen; JWT compared in ADR 0006 | 4 | Session cookie vs JWT, CSRF, XSS, where tokens live |
+| PostgreSQL / SQL | EF Core + migrations + indexes | 3 | Joins, indexes, `EXPLAIN ANALYZE`, transactions, N+1 queries |
+| Redis | Cache dashboard numbers via `IDistributedCache` | 6 | Cache-aside, TTL, invalidation, when not to cache |
+| Linux basics | CI runners, Docker images, container shell | 0, 6, 8 | Files, permissions, processes, env vars, logs, SSH |
+| Docker | Dockerfile, compose, Testcontainers | 0, 3, 6 | Image vs container, layers, volumes, networks, multi-stage builds |
+| GitHub Actions (CI/CD) | Build, test, coverage, deploy workflows | 0, 7, 8 | Pipelines, caching, secrets, deploy on tag |
+| Cloud (AWS on roadmap) | Azure Container Apps + PostgreSQL + Blob Storage | 8 | Map: EC2/ECS ↔ Container Apps, S3 ↔ Blob, RDS ↔ Azure PostgreSQL, SES ↔ email service |
+| Infrastructure as Code (Terraform) | Terraform for the Azure resources (stretch) | 8 | State, plan vs apply, why IaC beats clicking in the portal |
+| Configuration management (Ansible) | Not used; container images replace it | — | Why containers reduce the need for server configuration tools |
+| Monitoring (Monit on roadmap) | Health checks, structured logs, OpenTelemetry, uptime check | 6, 8 | Logs vs metrics vs traces; what to alert on |
+
+Also essential for interviews though not a node on the roadmap: web security (OWASP Top 10), testing pyramid, accessibility, and frontend performance (Lighthouse). They are covered by tasks in the phases below.
+
+---
+
 ## Phase 0 — Walking skeleton
 
 Goal: browser → API → CI, end to end, with no features.
@@ -74,6 +109,9 @@ Goal: browser → API → CI, end to end, with no features.
 - [ ] `docker-compose.yml` with PostgreSQL 17 (named volume, credentials from `.env`, `.env.example` committed)
 - [ ] `.github/workflows/ci.yml`: jobs `api` (restore, build, test) and `web` (npm ci, lint, build)
 - [ ] `docs/adr/0001-use-clean-architecture.md`, `docs/devlog.md`, minimal `README.md`
+- [x] `.gitattributes` (LF endings, binary images)
+- [ ] Branch protection on `main` requiring green CI; PR template with the clean code checklist
+- [ ] `docs/learning/http-basics.md`: owner's own notes on one request traced in browser DevTools (Network tab: method, status, headers, timing)
 
 ```
 qualitrack/
@@ -143,6 +181,8 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [ ] Initial migration; apply automatically in Development only
 - [ ] Integration tests with Testcontainers PostgreSQL: save/load round-trip preserves actions and history; two concurrent raises get different numbers
 - [ ] `docs/adr/0004-testcontainers-over-in-memory-database.md`
+- [ ] Run `EXPLAIN ANALYZE` on the NCR list query with 10,000 seeded rows before and after indexes; record results in `docs/learning/sql-indexes.md`
+- [ ] Integration test proving the list query issues a single SQL query (no N+1)
 
 **Done when:** persistence tests pass in CI (Docker available on `ubuntu-latest`).
 
@@ -159,6 +199,10 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [ ] Correlation ID middleware + structured request logging
 - [ ] Integration tests per endpoint: happy path, 400, 401, 403, 404, 409; full lifecycle test Open → Closed via HTTP
 - [ ] `docs/adr/0006-cookie-auth-over-jwt.md`
+- [ ] Antiforgery (CSRF) protection for cookie-authenticated state-changing endpoints; test that a request without the token is rejected
+- [ ] Security headers (CSP, `X-Content-Type-Options`, `Referrer-Policy`); rate limiting on `/api/auth/login`
+- [ ] `docs/learning/owasp-top-10.md`: each OWASP Top 10 item, and where QualiTrack defends against it (or why it doesn't apply)
+- [ ] ADR 0006 must compare cookie sessions with JWT (storage, CSRF/XSS exposure, revocation)
 
 **Done when:** full lifecycle integration test passes; OpenAPI document lists every endpoint.
 
@@ -172,6 +216,9 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [ ] Status and severity shown with text + colour (never colour only)
 - [ ] Component tests for the raise form and status badge (Vitest + Testing Library)
 - [ ] One Playwright smoke test: login as each role and run the lifecycle
+- [ ] Tailwind CSS for styling (ADR 0007 records the choice); responsive layout tested at 375 px and 1280 px
+- [ ] Semantic HTML and accessibility: every input labelled, keyboard-only lifecycle run, axe/Lighthouse accessibility score ≥ 90
+- [ ] Lighthouse performance score ≥ 90 on the NCR list page; route-level code splitting
 
 **Done when:** a reviewer can run the whole lifecycle in the browser with the three demo users.
 
@@ -184,6 +231,8 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [ ] Seed script with ~50 realistic NCRs across states for the demo
 - [ ] Multi-stage `Dockerfile` for Api (serves built `web/` as static files) and full `docker compose up` run
 - [ ] `docs/adr/0003-time-and-user-passed-into-the-domain.md`
+- [ ] Redis in `docker-compose.yml`; cache dashboard results with `IDistributedCache` (cache-aside, 60 s TTL, invalidated when an NCR changes status); falls back to the database if Redis is down
+- [ ] OpenTelemetry tracing and metrics for API + EF Core; request duration visible locally
 
 **Done when:** `docker compose up` starts a working app from a clean clone.
 
@@ -206,5 +255,8 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [ ] CD workflow on tag `v*`
 - [ ] README per the guide: pitch, live link, CI badge, demo GIF/video, problem, state diagram, rules, architecture, ADR links, how to run, testing, what's next
 - [ ] Tag `v1.0.0` with release notes
+- [ ] (Stretch) Terraform for all Azure resources in `infra/`; `terraform plan` runs in CI on pull requests
+- [ ] Uptime check on `/health` with an alert email
+- [ ] `docs/learning/cloud-mapping.md`: owner's notes mapping each Azure resource used to its AWS equivalent
 
 **Done when:** PRD §10 success criteria are all met.
