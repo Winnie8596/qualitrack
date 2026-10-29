@@ -195,9 +195,9 @@ Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is 
 - [x] `QualiTrackDbContext` with EF Core + Npgsql; configurations in separate `IEntityTypeConfiguration<T>` classes
 - [x] Map the `NonConformance` aggregate: value objects (`UserId`, `NcrNumber`, `NcrDetails`) via conversions/owned types; private backing fields for actions and history; private parameterless constructors only where EF requires them; unique index on NCR number (agreed with owner: actions and history as JSON columns via EF complex collections, so they load with the NCR and keep their order)
 - [x] `NcrRepository`, `UnitOfWork`, `SystemClock`
-- [ ] `NcrNumberGenerator` safe under concurrency (per-year sequence table updated in a transaction)
+- [x] `NcrNumberGenerator` safe under concurrency (per-year sequence table updated in a transaction)
 - [ ] Initial migration; apply automatically in Development only
-- [ ] Testcontainers PostgreSQL: save/load round-trip preserves actions and history; two concurrent raises get different numbers
+- [x] Testcontainers PostgreSQL: save/load round-trip preserves actions and history; two concurrent raises get different numbers
 - [ ] `docs/adr/0004-testcontainers-over-in-memory-database.md`
 
 ### Authentication
