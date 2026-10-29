@@ -54,7 +54,7 @@ public sealed class NonConformance
 
         InvestigatorId = investigator;
         DueDate = dueDate;
-        Status = NcrStatus.Investigating;
+        MoveTo(NcrStatus.Investigating, stamp);
     }
 
     public void PlanFix(string rootCause, IReadOnlyCollection<string> actionDescriptions, AuditStamp stamp)
@@ -72,7 +72,7 @@ public sealed class NonConformance
 
         RootCause = cause;
         _actions.AddRange(actions);
-        Status = NcrStatus.ActionInProgress;
+        MoveTo(NcrStatus.ActionInProgress, stamp);
     }
 
     public void AddCorrectiveAction(string description, AuditStamp stamp)
@@ -103,7 +103,7 @@ public sealed class NonConformance
             throw new DomainException("Every corrective action must be completed before submitting for verification.");
         }
 
-        Status = NcrStatus.PendingVerification;
+        MoveTo(NcrStatus.PendingVerification, stamp);
     }
 
     public void Verify(AuditStamp stamp) => throw new NotImplementedException();
@@ -113,6 +113,13 @@ public sealed class NonConformance
     public void Cancel(string reason, AuditStamp stamp) => throw new NotImplementedException();
 
     public bool IsOverdue(DateTimeOffset now) => throw new NotImplementedException();
+
+    // BR-7: the only place Status changes, so no transition can skip the audit trail
+    private void MoveTo(NcrStatus to, AuditStamp stamp, string? note = null)
+    {
+        _history.Add(new StatusChange(Status, to, stamp, note));
+        Status = to;
+    }
 
     private void EnsureStatus(NcrStatus required)
     {
