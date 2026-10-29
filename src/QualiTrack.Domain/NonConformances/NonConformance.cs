@@ -34,7 +34,7 @@ public sealed class NonConformance
 
     public IReadOnlyList<StatusChange> History => _history;
 
-    public bool IsFinished => throw new NotImplementedException();
+    public bool IsFinished => Status is NcrStatus.Closed or NcrStatus.Cancelled;
 
     public static NonConformance Raise(NcrNumber number, NcrDetails details, AuditStamp raised) =>
         new(number, details, raised) { Status = NcrStatus.Open };
@@ -132,7 +132,8 @@ public sealed class NonConformance
         MoveTo(NcrStatus.Cancelled, stamp, note);
     }
 
-    public bool IsOverdue(DateTimeOffset now) => throw new NotImplementedException();
+    // BR-8. With no due date yet, the lifted comparison "now > null" is false, so it is not overdue.
+    public bool IsOverdue(DateTimeOffset now) => !IsFinished && now > DueDate;
 
     // BR-7: the only place Status changes, so no transition can skip the audit trail
     private void MoveTo(NcrStatus to, AuditStamp stamp, string? note = null)
