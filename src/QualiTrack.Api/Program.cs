@@ -20,6 +20,7 @@ if (app.Environment.IsDevelopment())
 
     // Convenient locally; in production, migrations are a deliberate deployment step, not a side effect of startup
     await app.Services.MigrateDatabaseAsync();
+    await app.Services.SeedDemoUsersAsync();
 }
 
 app.UseHttpsRedirection();

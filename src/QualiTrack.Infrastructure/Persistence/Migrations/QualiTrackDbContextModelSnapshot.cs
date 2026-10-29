@@ -48,6 +48,29 @@ namespace QualiTrack.Infrastructure.Persistence.Migrations
                         .HasDatabaseName("RoleNameIndex");
 
                     b.ToTable("AspNetRoles", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("c33ee7d7-1443-4b5d-a9e3-76c95376fb7c"),
+                            ConcurrencyStamp = "cdbbc068-582f-4cd7-9258-f4d4cbad7211",
+                            Name = "Inspector",
+                            NormalizedName = "INSPECTOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("c89f3d68-15b6-440d-9fe7-c98b91bfa962"),
+                            ConcurrencyStamp = "ec4145f4-63bd-4f13-89f8-1fa6601ff792",
+                            Name = "Investigator",
+                            NormalizedName = "INVESTIGATOR"
+                        },
+                        new
+                        {
+                            Id = new Guid("8e23cde2-7b5b-4535-adfd-3d44b37eeebf"),
+                            ConcurrencyStamp = "0cc6b840-a183-4c95-936e-45d0834a01ac",
+                            Name = "QaManager",
+                            NormalizedName = "QAMANAGER"
+                        });
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

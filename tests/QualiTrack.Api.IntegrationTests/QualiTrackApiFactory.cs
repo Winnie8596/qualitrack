@@ -12,6 +12,8 @@ namespace QualiTrack.Api.IntegrationTests;
 /// </summary>
 public sealed class QualiTrackApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
+    public const string DemoPassword = "Demo-Password-1";
+
     private readonly PostgreSqlContainer _database = new PostgreSqlBuilder("postgres:17-alpine").Build();
 
     public QualiTrackDbContext CreateDbContext() =>
@@ -28,7 +30,10 @@ public sealed class QualiTrackApiFactory : WebApplicationFactory<Program>, IAsyn
     protected override void ConfigureWebHost(IWebHostBuilder builder) =>
         builder
             .UseEnvironment("Development")
-            .UseSetting("ConnectionStrings:QualiTrack", _database.GetConnectionString());
+            .UseSetting("ConnectionStrings:QualiTrack", _database.GetConnectionString())
+            .UseSetting("DemoUsers:Inspector", DemoPassword)
+            .UseSetting("DemoUsers:Investigator", DemoPassword)
+            .UseSetting("DemoUsers:QaManager", DemoPassword);
 }
 
 [CollectionDefinition(Name)]
