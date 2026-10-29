@@ -1,3 +1,4 @@
+using QualiTrack.Api.Authentication;
 using QualiTrack.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,6 +10,7 @@ var connectionString = builder.Configuration.GetConnectionString("QualiTrack")
 builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddPersistence(connectionString);
+builder.Services.AddCookieAuthentication();
 
 var app = builder.Build();
 
@@ -21,6 +23,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapHealthChecks("/health");
 
