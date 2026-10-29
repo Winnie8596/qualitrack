@@ -1,4 +1,7 @@
+using System.Text.Json.Serialization;
 using QualiTrack.Api.Authentication;
+using QualiTrack.Api.Http;
+using QualiTrack.Api.Ncrs;
 using QualiTrack.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,11 +11,22 @@ var connectionString = builder.Configuration.GetConnectionString("QualiTrack")
     ?? throw new InvalidOperationException("Connection string 'QualiTrack' is not configured.");
 
 builder.Services.AddOpenApi();
-builder.Services.AddProblemDetails();
+builder.Services.AddProblemDetails(options => options.CustomizeProblemDetails = ValidationFieldNames.UseJsonNames);
+builder.Services.AddValidation();
+
+// Development otherwise throws on a body that cannot be read, which the exception handler turns into a 500;
+// this answers 400 in every environment, as production already does
+builder.Services.Configure<RouteHandlerOptions>(options => options.ThrowOnBadRequest = false);
+
+// Enums travel as their names ("Critical", "Open"), so the web app does not depend on the enums' numbering,
+// and a number in their place is refused rather than read as whichever value has it
+builder.Services.ConfigureHttpJsonOptions(options =>
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false)));
 builder.Services.AddHealthChecks();
 builder.Services.AddPersistence(connectionString);
 builder.Services.AddCookieAuthentication();
 builder.Services.AddLoginRateLimit(builder.Configuration);
+builder.Services.AddNcrUseCases();
 
 var app = builder.Build();
 
@@ -37,5 +51,6 @@ app.UseRateLimiter();
 
 app.MapHealthChecks("/health");
 app.MapAuthEndpoints();
+app.MapNcrEndpoints();
 
 await app.RunAsync();

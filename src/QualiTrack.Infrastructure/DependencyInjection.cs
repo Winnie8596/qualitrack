@@ -11,7 +11,11 @@ public static class DependencyInjection
     public static IServiceCollection AddPersistence(this IServiceCollection services, string connectionString) =>
         services
             .AddDbContext<QualiTrackDbContext>(options => options.UseNpgsql(connectionString))
-            .AddScoped<IUserDirectory, IdentityUserDirectory>();
+            .AddScoped<INcrRepository, NcrRepository>()
+            .AddScoped<IUnitOfWork, UnitOfWork>()
+            .AddScoped<INcrNumberGenerator, NcrNumberGenerator>()
+            .AddScoped<IUserDirectory, IdentityUserDirectory>()
+            .AddSingleton<IClock, SystemClock>();
 
     /// <summary>Applies any migrations the database has not had yet. Development only; see Program.</summary>
     public static async Task MigrateDatabaseAsync(this IServiceProvider services)
