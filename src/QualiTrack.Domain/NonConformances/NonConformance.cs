@@ -75,11 +75,36 @@ public sealed class NonConformance
         Status = NcrStatus.ActionInProgress;
     }
 
-    public void AddCorrectiveAction(string description, AuditStamp stamp) => throw new NotImplementedException();
+    public void AddCorrectiveAction(string description, AuditStamp stamp)
+    {
+        EnsureStatus(NcrStatus.ActionInProgress);
+        EnsureIsInvestigator(stamp.By);
 
-    public void CompleteAction(Guid actionId, AuditStamp stamp) => throw new NotImplementedException();
+        _actions.Add(new CorrectiveAction(description, stamp));
+    }
 
-    public void SubmitForVerification(AuditStamp stamp) => throw new NotImplementedException();
+    public void CompleteAction(Guid actionId, AuditStamp stamp)
+    {
+        EnsureStatus(NcrStatus.ActionInProgress);
+        EnsureIsInvestigator(stamp.By);
+        var action = _actions.SingleOrDefault(candidate => candidate.Id == actionId)
+            ?? throw new DomainException($"Corrective action {actionId} is not on this NCR.");
+
+        action.Complete(stamp);
+    }
+
+    // BR-4. Root cause and at least one action are guaranteed by PlanFix, the only way into ActionInProgress.
+    public void SubmitForVerification(AuditStamp stamp)
+    {
+        EnsureStatus(NcrStatus.ActionInProgress);
+        EnsureIsInvestigator(stamp.By);
+        if (_actions.Exists(action => !action.IsCompleted))
+        {
+            throw new DomainException("Every corrective action must be completed before submitting for verification.");
+        }
+
+        Status = NcrStatus.PendingVerification;
+    }
 
     public void Verify(AuditStamp stamp) => throw new NotImplementedException();
 
