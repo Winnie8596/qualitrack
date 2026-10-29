@@ -21,6 +21,6 @@ public sealed class IdentityRolesTests
         Assert.Equal(Role.Investigator, IdentityRoles.From(["Auditor", "Investigator"]));
 
     [Fact]
-    public void A_user_with_two_roles_breaks_the_one_role_rule() =>
-        Assert.Throws<InvalidOperationException>(() => IdentityRoles.From(["Inspector", "QaManager"]));
+    public void A_user_with_two_roles_breaks_the_one_role_rule_so_has_no_role() =>
+        Assert.Null(IdentityRoles.From(["Inspector", "QaManager"]));
 }

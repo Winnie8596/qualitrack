@@ -33,7 +33,10 @@ public sealed class QualiTrackApiFactory : WebApplicationFactory<Program>, IAsyn
             .UseSetting("ConnectionStrings:QualiTrack", _database.GetConnectionString())
             .UseSetting("DemoUsers:Inspector", DemoPassword)
             .UseSetting("DemoUsers:Investigator", DemoPassword)
-            .UseSetting("DemoUsers:QaManager", DemoPassword);
+            .UseSetting("DemoUsers:QaManager", DemoPassword)
+            // Every test client shares one address, so the real limit would soon refuse other tests' logins;
+            // AuthEndpointsTests checks the limit on a host of its own
+            .UseSetting("LoginRateLimit:PermitLimit", "1000");
 }
 
 [CollectionDefinition(Name)]

@@ -25,7 +25,7 @@ public sealed class HttpCurrentUser(IHttpContextAccessor accessor, IOptions<Iden
     // The role is the one at sign-in; a role changed since takes effect when the user signs in again
     public Role Role =>
         IdentityRoles.From(SignedInUser().FindAll(_claimTypes.RoleClaimType).Select(claim => claim.Value))
-        ?? throw new InvalidOperationException("The signed-in user has none of the three roles.");
+        ?? throw new InvalidOperationException("The signed-in user does not have exactly one of the three roles.");
 
     private ClaimsPrincipal SignedInUser()
     {

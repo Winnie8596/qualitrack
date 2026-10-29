@@ -11,6 +11,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddHealthChecks();
 builder.Services.AddPersistence(connectionString);
 builder.Services.AddCookieAuthentication();
+builder.Services.AddLoginRateLimit(builder.Configuration);
 
 var app = builder.Build();
 
@@ -26,7 +27,9 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseRateLimiter();
 
 app.MapHealthChecks("/health");
+app.MapAuthEndpoints();
 
 await app.RunAsync();
