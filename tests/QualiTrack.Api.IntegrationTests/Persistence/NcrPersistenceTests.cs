@@ -4,7 +4,8 @@ using QualiTrack.Domain.NonConformances;
 
 namespace QualiTrack.Api.IntegrationTests.Persistence;
 
-public sealed class NcrPersistenceTests(PostgresFixture database) : IClassFixture<PostgresFixture>
+[Collection(PostgresCollection.Name)]
+public sealed class NcrPersistenceTests(PostgresFixture database)
 {
     private static readonly DateTimeOffset _raisedAt = new(2026, 10, 1, 9, 0, 0, TimeSpan.Zero);
     private static readonly UserId _inspector = new(Guid.NewGuid());
@@ -14,7 +15,7 @@ public sealed class NcrPersistenceTests(PostgresFixture database) : IClassFixtur
     [Fact]
     public async Task A_saved_ncr_loads_back_with_its_actions_and_history_in_order()
     {
-        var ncr = RejectedOnceThenResubmitted();
+        var ncr = RejectedOnceThenResubmitted(database.NextNumber());
         await using (var writeContext = database.CreateContext())
         {
             writeContext.NonConformances.Add(ncr);
@@ -38,10 +39,10 @@ public sealed class NcrPersistenceTests(PostgresFixture database) : IClassFixtur
     }
 
     // Every part filled in: two actions (one completed late), and a rejection note in the history
-    private static NonConformance RejectedOnceThenResubmitted()
+    private static NonConformance RejectedOnceThenResubmitted(NcrNumber number)
     {
         var ncr = NonConformance.Raise(
-            NcrNumber.From(2026, 1),
+            number,
             new NcrDetails("Weld crack on beam B4", "Hairline crack along the fillet weld.", "Bay 3", Severity.Critical),
             new AuditStamp(_inspector, _raisedAt));
         ncr.AssignInvestigator(_investigator, _raisedAt.AddDays(7), Day(1, _manager));
