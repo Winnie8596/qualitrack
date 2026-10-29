@@ -158,7 +158,7 @@ Goal: BR-1 … BR-9 enforced and unit-tested in `QualiTrack.Domain`. No packages
 
 Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.Extensions.*` abstractions.
 
-- [ ] `Result` / `Result<T>` with error kinds: `Validation`, `NotFound`, `Forbidden`, `Conflict`
+- [x] `Result` / `Result<T>` with error kinds: `Validation`, `NotFound`, `Forbidden`, `Conflict`
 - [ ] Interfaces: `INcrRepository`, `IUnitOfWork`, `IClock`, `ICurrentUser` (Id + Role), `INcrNumberGenerator`, `IFileStore`
 - [ ] Commands + handlers (one file each): `RaiseNcr`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteCorrectiveAction`, `SubmitForVerification`, `VerifyNcr`, `RejectVerification`, `CancelNcr`
 - [ ] Queries + handlers: `GetNcrById`, `ListNcrs` (filters, sort, paging, role visibility per PRD D1), `GetDashboard`
