@@ -198,7 +198,7 @@ Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is 
 - [x] `NcrNumberGenerator` safe under concurrency (per-year sequence table updated in a transaction)
 - [x] Initial migration; apply automatically in Development only
 - [x] Testcontainers PostgreSQL: save/load round-trip preserves actions and history; two concurrent raises get different numbers
-- [ ] `docs/adr/0004-testcontainers-over-in-memory-database.md`
+- [x] `docs/adr/0004-testcontainers-over-in-memory-database.md`
 
 ### Authentication
 
