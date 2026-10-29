@@ -108,7 +108,7 @@ Goal: browser → API → CI, end to end, with no features.
 - [x] `web/`: Vite React TS app showing "API status: healthy | unreachable" from `/health` via dev proxy
 - [x] `docker-compose.yml` with PostgreSQL 17 (named volume, credentials from `.env`, `.env.example` committed)
 - [x] `.github/workflows/ci.yml`: jobs `api` (restore, build, test) and `web` (npm ci, lint, build)
-- [ ] `docs/adr/0001-use-clean-architecture.md`, `docs/devlog.md`, minimal `README.md`
+- [x] `docs/adr/0001-use-clean-architecture.md`, `docs/devlog.md`, minimal `README.md`
 - [x] `.gitattributes` (LF endings, binary images)
 - [ ] Branch protection on `main` requiring green CI; PR template with the clean code checklist
 - [ ] `docs/learning/http-basics.md`: owner's own notes on one request traced in browser DevTools (Network tab: method, status, headers, timing)
