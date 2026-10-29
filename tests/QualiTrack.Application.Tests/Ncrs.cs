@@ -32,6 +32,15 @@ internal static class Ncrs
         return ncr;
     }
 
+    public static NonConformance PendingVerification(UserId investigator)
+    {
+        var ncr = ActionInProgress(investigator);
+        var stamp = new AuditStamp(investigator, RaisedAt.AddHours(3));
+        ncr.CompleteAction(ncr.Actions[0].Id, stamp);
+        ncr.SubmitForVerification(stamp);
+        return ncr;
+    }
+
     public static NonConformance Cancelled()
     {
         var ncr = Open();
