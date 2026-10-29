@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using QualiTrack.Application.Abstractions;
 using QualiTrack.Infrastructure.Persistence;
 
 namespace QualiTrack.Api.Authentication;
@@ -17,6 +18,7 @@ public static class AuthenticationSetup
             .AddRoles<IdentityRole<Guid>>()
             .AddEntityFrameworkStores<QualiTrackDbContext>()
             .AddSignInManager();
+        services.AddHttpContextAccessor().AddScoped<ICurrentUser, HttpCurrentUser>();
 
         services.ConfigureApplicationCookie(options =>
         {

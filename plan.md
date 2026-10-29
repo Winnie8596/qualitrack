@@ -204,7 +204,7 @@ Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is 
 
 - [x] ASP.NET Core Identity on PostgreSQL; cookie auth (`HttpOnly`, `Secure`, `SameSite=Strict`); return `401/403` instead of redirects for `/api/*`
 - [x] Seed three roles and one demo user per role (Development only; passwords from config)
-- [ ] `ICurrentUser` from `HttpContext`; `IUserDirectory` over Identity
+- [x] `ICurrentUser` from `HttpContext`; `IUserDirectory` over Identity
 - [ ] `/api/auth/login`, `/api/auth/logout`, `/api/auth/me` with integration tests (incl. 401); rate limiting on login
 - [ ] `docs/adr/0006-cookie-auth-over-jwt.md`, comparing cookie sessions with JWT (storage, CSRF/XSS exposure, revocation)
 
