@@ -206,7 +206,7 @@ Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is 
 - [x] Seed three roles and one demo user per role (Development only; passwords from config)
 - [x] `ICurrentUser` from `HttpContext`; `IUserDirectory` over Identity
 - [x] `/api/auth/login`, `/api/auth/logout`, `/api/auth/me` with integration tests (incl. 401); rate limiting on login
-- [ ] `docs/adr/0006-cookie-auth-over-jwt.md`, comparing cookie sessions with JWT (storage, CSRF/XSS exposure, revocation)
+- [x] `docs/adr/0006-cookie-auth-over-jwt.md`, comparing cookie sessions with JWT (storage, CSRF/XSS exposure, revocation)
 
 ### API
 
