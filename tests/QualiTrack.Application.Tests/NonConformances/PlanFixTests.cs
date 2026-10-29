@@ -91,7 +91,7 @@ public sealed class PlanFixTests
     }
 
     private PlanFixHandler CreateHandler(ICurrentUser currentUser) =>
-        new(_repository, _unitOfWork, new FixedClock(_now), currentUser);
+        new(new NcrCommandRunner(_repository, _unitOfWork, new FixedClock(_now), currentUser), currentUser);
 
     private void AssertFailedWithoutSaving(ErrorKind expected, Result result)
     {

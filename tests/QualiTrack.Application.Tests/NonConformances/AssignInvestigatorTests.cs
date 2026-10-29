@@ -109,8 +109,11 @@ public sealed class AssignInvestigatorTests
         return ncr;
     }
 
-    private AssignInvestigatorHandler CreateHandler(ICurrentUser? currentUser = null) =>
-        new(_repository, _unitOfWork, new FixedClock(_now), currentUser ?? new FakeCurrentUser(Role.QaManager), _users);
+    private AssignInvestigatorHandler CreateHandler(ICurrentUser? currentUser = null)
+    {
+        var caller = currentUser ?? new FakeCurrentUser(Role.QaManager);
+        return new(new NcrCommandRunner(_repository, _unitOfWork, new FixedClock(_now), caller), caller, _users);
+    }
 
     private void AssertFailedWithoutSaving(ErrorKind expected, Result result)
     {
