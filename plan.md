@@ -106,7 +106,7 @@ Goal: browser → API → CI, end to end, with no features.
 - [x] Api: `/health` via `AddHealthChecks`, OpenAPI in Development (no `public partial class Program { }`: .NET 10 makes `Program` public for `WebApplicationFactory`; ASP0027)
 - [x] Integration test: `Health_returns_200_when_the_app_starts`
 - [x] `web/`: Vite React TS app showing "API status: healthy | unreachable" from `/health` via dev proxy
-- [ ] `docker-compose.yml` with PostgreSQL 17 (named volume, credentials from `.env`, `.env.example` committed)
+- [x] `docker-compose.yml` with PostgreSQL 17 (named volume, credentials from `.env`, `.env.example` committed)
 - [ ] `.github/workflows/ci.yml`: jobs `api` (restore, build, test) and `web` (npm ci, lint, build)
 - [ ] `docs/adr/0001-use-clean-architecture.md`, `docs/devlog.md`, minimal `README.md`
 - [x] `.gitattributes` (LF endings, binary images)
