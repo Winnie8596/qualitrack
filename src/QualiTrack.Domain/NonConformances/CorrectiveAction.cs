@@ -26,7 +26,7 @@ public sealed class CorrectiveAction
     {
         if (IsCompleted)
         {
-            throw new DomainException("Corrective action is already completed.");
+            throw DomainException.InvalidState("Corrective action is already completed.");
         }
 
         Completed = completed;

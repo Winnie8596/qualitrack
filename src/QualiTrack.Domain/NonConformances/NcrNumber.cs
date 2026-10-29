@@ -15,12 +15,12 @@ public sealed record NcrNumber
     {
         if (year is < 1000 or > 9999)
         {
-            throw new DomainException("NCR year must have four digits.");
+            throw DomainException.InvalidInput("NCR year must have four digits.");
         }
 
         if (sequence is < 1 or > MaxSequence)
         {
-            throw new DomainException($"NCR sequence must be between 1 and {MaxSequence}.");
+            throw DomainException.InvalidInput($"NCR sequence must be between 1 and {MaxSequence}.");
         }
 
         return new NcrNumber(string.Create(CultureInfo.InvariantCulture, $"NCR-{year:D4}-{sequence:D4}"));

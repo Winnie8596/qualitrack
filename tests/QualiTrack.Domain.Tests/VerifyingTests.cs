@@ -11,7 +11,7 @@ public sealed class VerifyingTests
 
         var exception = Record.Exception(() => ncr.Verify(Ncrs.Day(4, Ncrs.Investigator)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.NotPermitted, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -33,7 +33,7 @@ public sealed class VerifyingTests
 
         var exception = Record.Exception(() => ncr.Verify(Ncrs.Day(4, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidState, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public sealed class VerifyingTests
 
         var exception = Record.Exception(() => ncr.RejectVerification("Not good enough", Ncrs.Day(4, Ncrs.Investigator)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.NotPermitted, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Theory]
@@ -69,6 +69,6 @@ public sealed class VerifyingTests
 
         var exception = Record.Exception(() => ncr.RejectVerification(reason, Ncrs.Day(4, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 }

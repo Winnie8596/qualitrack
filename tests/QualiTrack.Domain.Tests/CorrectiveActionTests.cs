@@ -15,7 +15,7 @@ public sealed class CorrectiveActionTests
     {
         var exception = Record.Exception(() => new CorrectiveAction(description, _added));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public sealed class CorrectiveActionTests
 
         var exception = Record.Exception(() => action.Complete(later));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidState, Assert.IsType<DomainException>(exception).Kind);
         Assert.Equal(_finished, action.Completed);
     }
 }

@@ -15,7 +15,7 @@ public sealed class NcrDetailsTests
     {
         var exception = Record.Exception(() => new NcrDetails(title, ValidDescription, ValidLocation, Severity.Major));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Theory]
@@ -25,7 +25,7 @@ public sealed class NcrDetailsTests
     {
         var exception = Record.Exception(() => new NcrDetails(ValidTitle, description, ValidLocation, Severity.Major));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Theory]
@@ -35,7 +35,7 @@ public sealed class NcrDetailsTests
     {
         var exception = Record.Exception(() => new NcrDetails(ValidTitle, ValidDescription, location, Severity.Major));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -45,7 +45,7 @@ public sealed class NcrDetailsTests
 
         var exception = Record.Exception(() => new NcrDetails(ValidTitle, ValidDescription, ValidLocation, unknown));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]

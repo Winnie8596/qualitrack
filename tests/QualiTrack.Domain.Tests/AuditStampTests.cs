@@ -9,6 +9,6 @@ public sealed class AuditStampTests
 
         var exception = Record.Exception(() => new AuditStamp(Ncrs.Inspector, kualaLumpurTime));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 }

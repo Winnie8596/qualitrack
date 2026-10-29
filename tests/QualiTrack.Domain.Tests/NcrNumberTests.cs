@@ -19,7 +19,7 @@ public sealed class NcrNumberTests
     {
         var exception = Record.Exception(() => NcrNumber.From(2026, sequence));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Theory]
@@ -29,6 +29,6 @@ public sealed class NcrNumberTests
     {
         var exception = Record.Exception(() => NcrNumber.From(year, 1));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 }

@@ -22,7 +22,7 @@ public sealed class WorkingOnTheFixTests
 
         var exception = Record.Exception(() => ncr.AddCorrectiveAction("Inspect the other welds", Ncrs.Day(3, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.NotPermitted, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -32,7 +32,7 @@ public sealed class WorkingOnTheFixTests
 
         var exception = Record.Exception(() => ncr.AddCorrectiveAction("Inspect the other welds", Ncrs.Day(3, Ncrs.Investigator)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidState, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public sealed class WorkingOnTheFixTests
 
         var exception = Record.Exception(() => ncr.CompleteAction(ncr.Actions[0].Id, Ncrs.Day(3, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.NotPermitted, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public sealed class WorkingOnTheFixTests
 
         var exception = Record.Exception(() => ncr.CompleteAction(Guid.NewGuid(), Ncrs.Day(3, Ncrs.Investigator)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public sealed class WorkingOnTheFixTests
 
         var exception = Record.Exception(() => ncr.SubmitForVerification(Ncrs.Day(3, Ncrs.Investigator)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidState, Assert.IsType<DomainException>(exception).Kind);
         Assert.Equal(NcrStatus.ActionInProgress, ncr.Status);
     }
 
@@ -98,6 +98,6 @@ public sealed class WorkingOnTheFixTests
 
         var exception = Record.Exception(() => ncr.SubmitForVerification(Ncrs.Day(3, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.NotPermitted, Assert.IsType<DomainException>(exception).Kind);
     }
 }
