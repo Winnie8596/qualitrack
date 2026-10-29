@@ -22,6 +22,27 @@ public sealed class NcrNumberTests
         Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
+    [Fact]
+    public void Ncr_number_is_read_back_from_its_text()
+    {
+        var number = NcrNumber.Parse("NCR-2026-0042");
+
+        Assert.Equal(NcrNumber.From(2026, 42), number);
+    }
+
+    [Theory]
+    [InlineData("")]
+    [InlineData("NCR-26-0001")]
+    [InlineData("ABC-2026-0001")]
+    [InlineData("NCR-2026-0000")]
+    [InlineData("NCR-2026-00001")]
+    public void Text_that_is_not_an_ncr_number_is_rejected(string text)
+    {
+        var exception = Record.Exception(() => NcrNumber.Parse(text));
+
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
+    }
+
     [Theory]
     [InlineData(999)]
     [InlineData(10_000)]
