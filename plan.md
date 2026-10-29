@@ -192,8 +192,8 @@ Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is 
 
 ### Persistence
 
-- [ ] `QualiTrackDbContext` with EF Core + Npgsql; configurations in separate `IEntityTypeConfiguration<T>` classes
-- [ ] Map the `NonConformance` aggregate: value objects (`UserId`, `NcrNumber`, `NcrDetails`) via conversions/owned types; private backing fields for actions and history; private parameterless constructors only where EF requires them; unique index on NCR number
+- [x] `QualiTrackDbContext` with EF Core + Npgsql; configurations in separate `IEntityTypeConfiguration<T>` classes
+- [x] Map the `NonConformance` aggregate: value objects (`UserId`, `NcrNumber`, `NcrDetails`) via conversions/owned types; private backing fields for actions and history; private parameterless constructors only where EF requires them; unique index on NCR number (agreed with owner: actions and history as JSON columns via EF complex collections, so they load with the NCR and keep their order)
 - [ ] `NcrRepository`, `UnitOfWork`, `SystemClock`
 - [ ] `NcrNumberGenerator` safe under concurrency (per-year sequence table updated in a transaction)
 - [ ] Initial migration; apply automatically in Development only
