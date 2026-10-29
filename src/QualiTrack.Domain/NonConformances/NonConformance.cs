@@ -41,6 +41,7 @@ public sealed class NonConformance
 
     public void AssignInvestigator(UserId investigator, DateTimeOffset dueDate, AuditStamp stamp)
     {
+        EnsureStatus(NcrStatus.Open);
         if (dueDate <= stamp.At)
         {
             throw new DomainException("Due date must be in the future.");
@@ -123,7 +124,13 @@ public sealed class NonConformance
         MoveTo(NcrStatus.ActionInProgress, stamp, note);
     }
 
-    public void Cancel(string reason, AuditStamp stamp) => throw new NotImplementedException();
+    public void Cancel(string reason, AuditStamp stamp)
+    {
+        EnsureStatus(NcrStatus.Open);
+        var note = RequiredText.Of(reason, "Cancellation reason");
+
+        MoveTo(NcrStatus.Cancelled, stamp, note);
+    }
 
     public bool IsOverdue(DateTimeOffset now) => throw new NotImplementedException();
 
