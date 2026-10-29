@@ -20,8 +20,7 @@ public sealed class RaiseNcrHandler(
             return Error.Forbidden("Only an inspector can raise an NCR.");
         }
 
-        // BR-1 lives in NcrDetails. Here a broken rule is bad input (A1: a field error), not a conflict with an
-        // existing NCR. Checked before taking a number so a rejected NCR does not use up a sequence value.
+        // Built before taking a number so a rejected NCR does not use up a sequence value
         NcrDetails details;
         try
         {
@@ -29,7 +28,7 @@ public sealed class RaiseNcrHandler(
         }
         catch (DomainException exception)
         {
-            return Error.Validation(exception.Message);
+            return DomainErrors.From(exception);
         }
 
         var now = clock.UtcNow;
