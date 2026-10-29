@@ -12,7 +12,7 @@ public static class AuthenticationSetup
     public static IServiceCollection AddCookieAuthentication(this IServiceCollection services)
     {
         services.AddAuthentication(IdentityConstants.ApplicationScheme).AddIdentityCookies();
-        services.AddAuthorization();
+        services.AddAuthorizationBuilder().AddPolicies();
         services
             .AddIdentityCore<IdentityUser<Guid>>(options => options.User.RequireUniqueEmail = true)
             .AddRoles<IdentityRole<Guid>>()

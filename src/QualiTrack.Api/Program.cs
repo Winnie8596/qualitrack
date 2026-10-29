@@ -8,6 +8,7 @@ var connectionString = builder.Configuration.GetConnectionString("QualiTrack")
     ?? throw new InvalidOperationException("Connection string 'QualiTrack' is not configured.");
 
 builder.Services.AddOpenApi();
+builder.Services.AddProblemDetails();
 builder.Services.AddHealthChecks();
 builder.Services.AddPersistence(connectionString);
 builder.Services.AddCookieAuthentication();
@@ -23,6 +24,11 @@ if (app.Environment.IsDevelopment())
     await app.Services.MigrateDatabaseAsync();
     await app.Services.SeedDemoUsersAsync();
 }
+
+// Every error is ProblemDetails (PRD §8): an unhandled exception becomes a 500 without its stack trace, and an
+// error with no body of its own (401 from the cookie, 404 for an unknown route) gets one
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

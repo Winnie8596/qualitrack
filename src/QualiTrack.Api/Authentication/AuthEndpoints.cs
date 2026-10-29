@@ -18,7 +18,7 @@ public static class AuthEndpoints
         var auth = endpoints.MapGroup("/api/auth");
         auth.MapPost("/login", LoginAsync).RequireRateLimiting(LoginRateLimit.Policy);
         auth.MapPost("/logout", LogoutAsync);
-        auth.MapGet("/me", Me).RequireAuthorization();
+        auth.MapGet("/me", Me).RequireAuthorization(Policies.SignedIn);
         return endpoints;
     }
 
