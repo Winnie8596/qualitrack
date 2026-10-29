@@ -106,9 +106,22 @@ public sealed class NonConformance
         MoveTo(NcrStatus.PendingVerification, stamp);
     }
 
-    public void Verify(AuditStamp stamp) => throw new NotImplementedException();
+    public void Verify(AuditStamp stamp)
+    {
+        EnsureStatus(NcrStatus.PendingVerification);
+        EnsureIsNotInvestigator(stamp.By);
 
-    public void RejectVerification(string reason, AuditStamp stamp) => throw new NotImplementedException();
+        MoveTo(NcrStatus.Closed, stamp);
+    }
+
+    public void RejectVerification(string reason, AuditStamp stamp)
+    {
+        EnsureStatus(NcrStatus.PendingVerification);
+        EnsureIsNotInvestigator(stamp.By);
+        var note = RequiredText.Of(reason, "Rejection reason");
+
+        MoveTo(NcrStatus.ActionInProgress, stamp, note);
+    }
 
     public void Cancel(string reason, AuditStamp stamp) => throw new NotImplementedException();
 
@@ -135,6 +148,15 @@ public sealed class NonConformance
         if (user != InvestigatorId)
         {
             throw new DomainException("Only the assigned investigator can do this.");
+        }
+    }
+
+    // BR-5
+    private void EnsureIsNotInvestigator(UserId user)
+    {
+        if (user == InvestigatorId)
+        {
+            throw new DomainException("The investigator cannot verify their own fix.");
         }
     }
 }
