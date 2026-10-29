@@ -132,7 +132,7 @@ qualitrack/
 Goal: BR-1 … BR-9 enforced and unit-tested in `QualiTrack.Domain`. No packages.
 
 - [x] Value objects: `DomainException`, `Severity`, `NcrStatus`, `UserId` (record struct), `AuditStamp(UserId By, DateTimeOffset At)`, `NcrNumber.From(year, sequence)`, `NcrDetails(title, description, location, severity)` with validation
-- [ ] `CorrectiveAction` (internal `Complete`), `StatusChange(From, To, Stamp, Note)`
+- [x] `CorrectiveAction` (internal `Complete`), `StatusChange(From, To, Stamp, Note)`
 - [ ] `NonConformance` aggregate: `Raise`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteAction`, `SubmitForVerification`, `Verify`, `RejectVerification`, `Cancel`, `IsOverdue(now)`, `IsFinished`
 - [ ] Test helper `Ncrs` that builds an NCR in each state
 - [ ] Tests (one cycle each, commit after each):
