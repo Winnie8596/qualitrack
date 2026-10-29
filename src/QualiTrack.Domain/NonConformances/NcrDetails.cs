@@ -7,7 +7,7 @@ public sealed record NcrDetails
     {
         if (!Enum.IsDefined(severity))
         {
-            throw new DomainException("Severity must be Minor, Major or Critical.");
+            throw DomainException.InvalidInput("Severity must be Minor, Major or Critical.");
         }
 
         Title = RequiredText.Of(title, "Title");

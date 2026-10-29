@@ -25,7 +25,7 @@ public sealed class CancellingTests
 
         var exception = Record.Exception(() => ncr.Cancel(reason, Ncrs.Day(1, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -35,6 +35,6 @@ public sealed class CancellingTests
 
         var exception = Record.Exception(() => ncr.Cancel("No longer needed", Ncrs.Day(2, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidState, Assert.IsType<DomainException>(exception).Kind);
     }
 }

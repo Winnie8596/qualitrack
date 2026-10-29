@@ -6,7 +6,7 @@ public readonly record struct UserId
     {
         if (value == Guid.Empty)
         {
-            throw new DomainException("User id is required.");
+            throw DomainException.InvalidInput("User id is required.");
         }
 
         Value = value;

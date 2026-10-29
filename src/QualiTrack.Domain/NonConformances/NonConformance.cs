@@ -45,13 +45,13 @@ public sealed class NonConformance
         RequiredUtc.Of(dueDate, "Due date");
         if (dueDate <= stamp.At)
         {
-            throw new DomainException("Due date must be in the future.");
+            throw DomainException.InvalidInput("Due date must be in the future.");
         }
 
         // BR-2
         if (Details.Severity == Severity.Critical && dueDate > Raised.At + _criticalMaxTimeToDue)
         {
-            throw new DomainException($"A critical NCR must be due within {_criticalMaxTimeToDue.Days} days of being raised.");
+            throw DomainException.InvalidInput($"A critical NCR must be due within {_criticalMaxTimeToDue.Days} days of being raised.");
         }
 
         InvestigatorId = investigator;
@@ -66,7 +66,7 @@ public sealed class NonConformance
         var cause = RequiredText.Of(rootCause, "Root cause");
         if (actionDescriptions.Count == 0)
         {
-            throw new DomainException("Planning the fix needs at least one corrective action.");
+            throw DomainException.InvalidInput("Planning the fix needs at least one corrective action.");
         }
 
         // Build every action before changing anything, so a bad description leaves the NCR untouched
@@ -90,7 +90,7 @@ public sealed class NonConformance
         EnsureStatus(NcrStatus.ActionInProgress);
         EnsureIsInvestigator(stamp.By);
         var action = _actions.SingleOrDefault(candidate => candidate.Id == actionId)
-            ?? throw new DomainException($"Corrective action {actionId} is not on this NCR.");
+            ?? throw DomainException.InvalidInput($"Corrective action {actionId} is not on this NCR.");
 
         action.Complete(stamp);
     }
@@ -102,7 +102,7 @@ public sealed class NonConformance
         EnsureIsInvestigator(stamp.By);
         if (_actions.Exists(action => !action.IsCompleted))
         {
-            throw new DomainException("Every corrective action must be completed before submitting for verification.");
+            throw DomainException.InvalidState("Every corrective action must be completed before submitting for verification.");
         }
 
         MoveTo(NcrStatus.PendingVerification, stamp);
@@ -147,7 +147,7 @@ public sealed class NonConformance
     {
         if (Status != required)
         {
-            throw new DomainException($"NCR must be {required} but is {Status}.");
+            throw DomainException.InvalidState($"NCR must be {required} but is {Status}.");
         }
     }
 
@@ -156,7 +156,7 @@ public sealed class NonConformance
     {
         if (user != InvestigatorId)
         {
-            throw new DomainException("Only the assigned investigator can do this.");
+            throw DomainException.NotPermitted("Only the assigned investigator can do this.");
         }
     }
 
@@ -165,7 +165,7 @@ public sealed class NonConformance
     {
         if (user == InvestigatorId)
         {
-            throw new DomainException("The investigator cannot verify their own fix.");
+            throw DomainException.NotPermitted("The investigator cannot verify their own fix.");
         }
     }
 }

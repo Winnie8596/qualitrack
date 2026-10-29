@@ -9,6 +9,6 @@ public sealed class UserIdTests
 
         var exception = Record.Exception(() => new UserId(empty));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 }

@@ -25,7 +25,7 @@ public sealed class AssigningTests
 
         var exception = Record.Exception(() => ncr.AssignInvestigator(Ncrs.Investigator, tooLate, Ncrs.Day(1, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -50,7 +50,7 @@ public sealed class AssigningTests
 
         var exception = Record.Exception(() => ncr.AssignInvestigator(Ncrs.Investigator, dueDate, assigned));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -61,6 +61,6 @@ public sealed class AssigningTests
 
         var exception = Record.Exception(() => ncr.AssignInvestigator(Ncrs.Investigator, dueInKualaLumpurTime, Ncrs.Day(1, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 }

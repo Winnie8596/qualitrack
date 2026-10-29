@@ -24,7 +24,7 @@ public sealed class FinishedNcrTests
 
         var exception = Record.Exception(() => ncr.Cancel("Too late", Ncrs.Day(5, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidState, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -34,7 +34,7 @@ public sealed class FinishedNcrTests
 
         var exception = Record.Exception(() => ncr.AssignInvestigator(Ncrs.Investigator, Ncrs.RaisedAt.AddDays(7), Ncrs.Day(2, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidState, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Theory]
@@ -45,7 +45,7 @@ public sealed class FinishedNcrTests
 
         var exception = Record.Exception(() => act(ncr));
 
-        Assert.True(exception is DomainException, $"'{command}' was not rejected on a closed NCR");
+        Assert.True(exception is DomainException { Kind: DomainErrorKind.InvalidState }, $"'{command}' was not rejected on a closed NCR");
         Assert.Equal(NcrStatus.Closed, ncr.Status);
     }
 
@@ -57,7 +57,7 @@ public sealed class FinishedNcrTests
 
         var exception = Record.Exception(() => act(ncr));
 
-        Assert.True(exception is DomainException, $"'{command}' was not rejected on a cancelled NCR");
+        Assert.True(exception is DomainException { Kind: DomainErrorKind.InvalidState }, $"'{command}' was not rejected on a cancelled NCR");
         Assert.Equal(NcrStatus.Cancelled, ncr.Status);
     }
 }

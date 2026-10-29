@@ -26,7 +26,7 @@ public sealed class PlanningTheFixTests
 
         var exception = Record.Exception(() => ncr.PlanFix(RootCause, ["Grind out and re-weld"], Ncrs.Day(2, Ncrs.Manager)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.NotPermitted, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Theory]
@@ -38,7 +38,7 @@ public sealed class PlanningTheFixTests
 
         var exception = Record.Exception(() => ncr.PlanFix(rootCause, ["Grind out and re-weld"], Ncrs.Day(2, Ncrs.Investigator)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public sealed class PlanningTheFixTests
 
         var exception = Record.Exception(() => ncr.PlanFix(RootCause, [], Ncrs.Day(2, Ncrs.Investigator)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidInput, Assert.IsType<DomainException>(exception).Kind);
     }
 
     [Fact]
@@ -58,6 +58,6 @@ public sealed class PlanningTheFixTests
 
         var exception = Record.Exception(() => ncr.PlanFix(RootCause, ["Grind out and re-weld"], Ncrs.Day(2, Ncrs.Investigator)));
 
-        Assert.IsType<DomainException>(exception);
+        Assert.Equal(DomainErrorKind.InvalidState, Assert.IsType<DomainException>(exception).Kind);
     }
 }
