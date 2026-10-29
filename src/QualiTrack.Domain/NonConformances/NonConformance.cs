@@ -2,6 +2,8 @@ namespace QualiTrack.Domain.NonConformances;
 
 public sealed class NonConformance
 {
+    private static readonly TimeSpan _criticalMaxTimeToDue = TimeSpan.FromDays(7);
+
     private readonly List<CorrectiveAction> _actions = [];
     private readonly List<StatusChange> _history = [];
 
@@ -37,8 +39,23 @@ public sealed class NonConformance
     public static NonConformance Raise(NcrNumber number, NcrDetails details, AuditStamp raised) =>
         new(number, details, raised) { Status = NcrStatus.Open };
 
-    public void AssignInvestigator(UserId investigator, DateTimeOffset dueDate, AuditStamp stamp) =>
-        throw new NotImplementedException();
+    public void AssignInvestigator(UserId investigator, DateTimeOffset dueDate, AuditStamp stamp)
+    {
+        if (dueDate <= stamp.At)
+        {
+            throw new DomainException("Due date must be in the future.");
+        }
+
+        // BR-2
+        if (Details.Severity == Severity.Critical && dueDate > Raised.At + _criticalMaxTimeToDue)
+        {
+            throw new DomainException("A critical NCR must be due within 7 days of being raised.");
+        }
+
+        InvestigatorId = investigator;
+        DueDate = dueDate;
+        Status = NcrStatus.Investigating;
+    }
 
     public void PlanFix(string rootCause, IReadOnlyCollection<string> actionDescriptions, AuditStamp stamp) =>
         throw new NotImplementedException();
