@@ -52,4 +52,15 @@ public sealed class AssigningTests
 
         Assert.IsType<DomainException>(exception);
     }
+
+    [Fact]
+    public void Due_date_must_be_utc()
+    {
+        var ncr = Ncrs.Open();
+        var dueInKualaLumpurTime = Ncrs.RaisedAt.AddDays(5).ToOffset(TimeSpan.FromHours(8));
+
+        var exception = Record.Exception(() => ncr.AssignInvestigator(Ncrs.Investigator, dueInKualaLumpurTime, Ncrs.Day(1, Ncrs.Manager)));
+
+        Assert.IsType<DomainException>(exception);
+    }
 }

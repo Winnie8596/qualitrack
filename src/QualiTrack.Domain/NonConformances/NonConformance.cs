@@ -42,6 +42,7 @@ public sealed class NonConformance
     public void AssignInvestigator(UserId investigator, DateTimeOffset dueDate, AuditStamp stamp)
     {
         EnsureStatus(NcrStatus.Open);
+        RequiredUtc.Of(dueDate, "Due date");
         if (dueDate <= stamp.At)
         {
             throw new DomainException("Due date must be in the future.");
