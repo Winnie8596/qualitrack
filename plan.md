@@ -38,7 +38,7 @@ src/QualiTrack.Api             → references Application + Infrastructure (comp
 - Business rules live **only** in Domain entities/value objects. Application orchestrates; it does not decide.
 - `NonConformance.Status` has a private setter. Status changes only via entity methods.
 - Domain never calls `DateTime.Now`, `DateTimeOffset.UtcNow`, or reads users from context. Time and user are passed in (`AuditStamp`).
-- Infrastructure implements interfaces declared in Application (`INcrRepository`, `IUnitOfWork`, `IClock`, `ICurrentUser`, `IFileStore`, `INcrNumberGenerator`).
+- Infrastructure implements interfaces declared in Application (`INcrRepository`, `IUnitOfWork`, `IClock`, `ICurrentUser`, `IFileStore`, `INcrNumberGenerator`, `IUserDirectory`).
 - Api endpoints are thin: map request → command/query → handler → map result to HTTP.
 
 ### Clean code checklist (every diff)
@@ -159,7 +159,7 @@ Goal: BR-1 … BR-9 enforced and unit-tested in `QualiTrack.Domain`. No packages
 Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.Extensions.*` abstractions.
 
 - [x] `Result` / `Result<T>` with error kinds: `Validation`, `NotFound`, `Forbidden`, `Conflict`
-- [x] Interfaces: `INcrRepository`, `IUnitOfWork`, `IClock`, `ICurrentUser` (Id + Role), `INcrNumberGenerator`, `IFileStore`
+- [x] Interfaces: `INcrRepository`, `IUnitOfWork`, `IClock`, `ICurrentUser` (Id + Role), `INcrNumberGenerator`, `IFileStore`, `IUserDirectory` (role of another user, for A2; added with owner's agreement)
 - [ ] Commands + handlers (one file each): `RaiseNcr`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteCorrectiveAction`, `SubmitForVerification`, `VerifyNcr`, `RejectVerification`, `CancelNcr`
 - [ ] Queries + handlers: `GetNcrById`, `ListNcrs` (filters, sort, paging, role visibility per PRD D1), `GetDashboard`
 - [ ] Role checks in handlers (who may call) — domain still enforces BR-3/BR-5 (who may act on *this* NCR)
