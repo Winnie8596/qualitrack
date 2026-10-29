@@ -50,7 +50,7 @@ public sealed class NonConformance
         // BR-2
         if (Details.Severity == Severity.Critical && dueDate > Raised.At + _criticalMaxTimeToDue)
         {
-            throw new DomainException("A critical NCR must be due within 7 days of being raised.");
+            throw new DomainException($"A critical NCR must be due within {_criticalMaxTimeToDue.Days} days of being raised.");
         }
 
         InvestigatorId = investigator;
@@ -135,7 +135,7 @@ public sealed class NonConformance
     // BR-8. With no due date yet, the lifted comparison "now > null" is false, so it is not overdue.
     public bool IsOverdue(DateTimeOffset now) => !IsFinished && now > DueDate;
 
-    // BR-7: the only place Status changes, so no transition can skip the audit trail
+    // BR-7: every change after Raise goes through here, so no transition can skip the audit trail
     private void MoveTo(NcrStatus to, AuditStamp stamp, string? note = null)
     {
         _history.Add(new StatusChange(Status, to, stamp, note));
