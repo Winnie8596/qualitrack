@@ -57,8 +57,23 @@ public sealed class NonConformance
         Status = NcrStatus.Investigating;
     }
 
-    public void PlanFix(string rootCause, IReadOnlyCollection<string> actionDescriptions, AuditStamp stamp) =>
-        throw new NotImplementedException();
+    public void PlanFix(string rootCause, IReadOnlyCollection<string> actionDescriptions, AuditStamp stamp)
+    {
+        EnsureStatus(NcrStatus.Investigating);
+        EnsureIsInvestigator(stamp.By);
+        var cause = RequiredText.Of(rootCause, "Root cause");
+        if (actionDescriptions.Count == 0)
+        {
+            throw new DomainException("Planning the fix needs at least one corrective action.");
+        }
+
+        // Build every action before changing anything, so a bad description leaves the NCR untouched
+        var actions = actionDescriptions.Select(description => new CorrectiveAction(description, stamp)).ToList();
+
+        RootCause = cause;
+        _actions.AddRange(actions);
+        Status = NcrStatus.ActionInProgress;
+    }
 
     public void AddCorrectiveAction(string description, AuditStamp stamp) => throw new NotImplementedException();
 
@@ -73,4 +88,21 @@ public sealed class NonConformance
     public void Cancel(string reason, AuditStamp stamp) => throw new NotImplementedException();
 
     public bool IsOverdue(DateTimeOffset now) => throw new NotImplementedException();
+
+    private void EnsureStatus(NcrStatus required)
+    {
+        if (Status != required)
+        {
+            throw new DomainException($"NCR must be {required} but is {Status}.");
+        }
+    }
+
+    // BR-3
+    private void EnsureIsInvestigator(UserId user)
+    {
+        if (user != InvestigatorId)
+        {
+            throw new DomainException("Only the assigned investigator can do this.");
+        }
+    }
 }
