@@ -131,14 +131,14 @@ qualitrack/
 
 Goal: BR-1 … BR-9 enforced and unit-tested in `QualiTrack.Domain`. No packages.
 
-- [ ] Value objects: `DomainException`, `Severity`, `NcrStatus`, `UserId` (record struct), `AuditStamp(UserId By, DateTimeOffset At)`, `NcrNumber.From(year, sequence)`, `NcrDetails(title, description, location, severity)` with validation
+- [x] Value objects: `DomainException`, `Severity`, `NcrStatus`, `UserId` (record struct), `AuditStamp(UserId By, DateTimeOffset At)`, `NcrNumber.From(year, sequence)`, `NcrDetails(title, description, location, severity)` with validation
 - [ ] `CorrectiveAction` (internal `Complete`), `StatusChange(From, To, Stamp, Note)`
 - [ ] `NonConformance` aggregate: `Raise`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteAction`, `SubmitForVerification`, `Verify`, `RejectVerification`, `Cancel`, `IsOverdue(now)`, `IsFinished`
 - [ ] Test helper `Ncrs` that builds an NCR in each state
 - [ ] Tests (one cycle each, commit after each):
   - [ ] `A_new_ncr_starts_open`
-  - [ ] `Title_is_required` (theory: `""`, `"   "`) and same for description, location
-  - [ ] `Ncr_number_is_padded_to_four_digits`
+  - [x] `Title_is_required` (theory: `""`, `"   "`) and same for description, location
+  - [x] `Ncr_number_is_padded_to_four_digits`
   - [ ] `Critical_ncr_cannot_be_due_more_than_7_days_after_it_was_raised` / `Critical_ncr_can_be_due_on_day_7`
   - [ ] `Due_date_must_be_in_the_future`
   - [ ] `Only_the_assigned_investigator_can_plan_the_fix`
