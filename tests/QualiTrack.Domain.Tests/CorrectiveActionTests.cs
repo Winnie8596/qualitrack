@@ -43,7 +43,7 @@ public sealed class CorrectiveActionTests
     {
         var action = new CorrectiveAction("Grind out and re-weld", _added);
         action.Complete(_finished);
-        var later = _finished with { At = _finished.At.AddDays(1) };
+        var later = new AuditStamp(_investigator, _finished.At.AddDays(1));
 
         var exception = Record.Exception(() => action.Complete(later));
 

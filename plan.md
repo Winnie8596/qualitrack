@@ -133,22 +133,22 @@ Goal: BR-1 … BR-9 enforced and unit-tested in `QualiTrack.Domain`. No packages
 
 - [x] Value objects: `DomainException`, `Severity`, `NcrStatus`, `UserId` (record struct), `AuditStamp(UserId By, DateTimeOffset At)`, `NcrNumber.From(year, sequence)`, `NcrDetails(title, description, location, severity)` with validation
 - [x] `CorrectiveAction` (internal `Complete`), `StatusChange(From, To, Stamp, Note)`
-- [ ] `NonConformance` aggregate: `Raise`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteAction`, `SubmitForVerification`, `Verify`, `RejectVerification`, `Cancel`, `IsOverdue(now)`, `IsFinished`
-- [ ] Test helper `Ncrs` that builds an NCR in each state
-- [ ] Tests (one cycle each, commit after each):
-  - [ ] `A_new_ncr_starts_open`
+- [x] `NonConformance` aggregate: `Raise`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteAction`, `SubmitForVerification`, `Verify`, `RejectVerification`, `Cancel`, `IsOverdue(now)`, `IsFinished`
+- [x] Test helper `Ncrs` that builds an NCR in each state
+- [x] Tests (one cycle each, commit after each):
+  - [x] `A_new_ncr_starts_open`
   - [x] `Title_is_required` (theory: `""`, `"   "`) and same for description, location
   - [x] `Ncr_number_is_padded_to_four_digits`
-  - [ ] `Critical_ncr_cannot_be_due_more_than_7_days_after_it_was_raised` / `Critical_ncr_can_be_due_on_day_7`
-  - [ ] `Due_date_must_be_in_the_future`
-  - [ ] `Only_the_assigned_investigator_can_plan_the_fix`
-  - [ ] `Cannot_submit_while_a_corrective_action_is_incomplete`
-  - [ ] `Investigator_cannot_verify_their_own_fix` / `Another_user_verifying_closes_the_ncr`
-  - [ ] `Rejected_verification_returns_ncr_to_action_in_progress_with_reason`
-  - [ ] `A_closed_ncr_cannot_be_cancelled` and `A_cancelled_ncr_cannot_be_assigned`
-  - [ ] `Each_status_change_is_recorded_with_who_and_when`
-  - [ ] `Ncr_is_overdue_after_its_due_date_unless_finished` (theory)
-  - [ ] `A_failed_command_leaves_the_ncr_unchanged`
+  - [x] `Critical_ncr_cannot_be_due_more_than_7_days_after_it_was_raised` / `Critical_ncr_can_be_due_on_day_7`
+  - [x] `Due_date_must_be_in_the_future`
+  - [x] `Only_the_assigned_investigator_can_plan_the_fix`
+  - [x] `Cannot_submit_while_a_corrective_action_is_incomplete`
+  - [x] `Investigator_cannot_verify_their_own_fix` / `Another_user_verifying_closes_the_ncr`
+  - [x] `Rejected_verification_returns_ncr_to_action_in_progress_with_reason`
+  - [x] `A_closed_ncr_cannot_be_cancelled` and `A_cancelled_ncr_cannot_be_assigned`
+  - [x] `Each_status_change_is_recorded_with_who_and_when`
+  - [x] `Ncr_is_overdue_after_its_due_date_unless_finished` (theory)
+  - [x] `A_failed_command_leaves_the_ncr_unchanged`
 
 **Done when:** all tests pass in < 5 s; Domain `.csproj` has no `PackageReference` or `ProjectReference`.
 
