@@ -164,7 +164,7 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [x] Role checks in handlers (who may call) — domain still enforces BR-3/BR-5 (who may act on *this* NCR)
 - [x] Map `DomainException` → `Result` at the handler boundary only, via `DomainErrors.From` (agreed with owner: the domain tags each broken rule; `InvalidInput` → `Validation`, `InvalidState` → `Conflict`, `NotPermitted` → `Forbidden`, so A1/A2 get field errors and BR-3/BR-5 give 403)
 - [x] Unit tests with hand-written in-memory fakes (no mocking library) for every command handler: success, not found, forbidden, conflict
-- [ ] `docs/adr/0002-business-rules-live-in-the-domain.md`, `0005-exceptions-inside-results-at-the-boundary.md`
+- [x] `docs/adr/0002-business-rules-live-in-the-domain.md`, `0005-exceptions-inside-results-at-the-boundary.md`
 
 Queries (`GetNcrById`, `ListNcrs`, `GetDashboard`) moved to the Phase 4 slices that first need them, so their shape follows the page that uses them.
 
