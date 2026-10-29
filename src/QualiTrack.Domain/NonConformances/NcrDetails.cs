@@ -10,9 +10,9 @@ public sealed record NcrDetails
             throw new DomainException("Severity must be Minor, Major or Critical.");
         }
 
-        Title = Required(title, "Title");
-        Description = Required(description, "Description");
-        Location = Required(location, "Location");
+        Title = RequiredText.Of(title, "Title");
+        Description = RequiredText.Of(description, "Description");
+        Location = RequiredText.Of(location, "Location");
         Severity = severity;
     }
 
@@ -23,7 +23,4 @@ public sealed record NcrDetails
     public string Location { get; }
 
     public Severity Severity { get; }
-
-    private static string Required(string value, string fieldName) =>
-        string.IsNullOrWhiteSpace(value) ? throw new DomainException($"{fieldName} is required.") : value;
 }
