@@ -163,7 +163,7 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [ ] Commands + handlers (one file each): `RaiseNcr`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteCorrectiveAction`, `SubmitForVerification`, `VerifyNcr`, `RejectVerification`, `CancelNcr`
 - [ ] Queries + handlers: `GetNcrById`, `ListNcrs` (filters, sort, paging, role visibility per PRD D1), `GetDashboard`
 - [ ] Role checks in handlers (who may call) — domain still enforces BR-3/BR-5 (who may act on *this* NCR)
-- [ ] Map `DomainException` → `Result` `Conflict` at the handler boundary only
+- [ ] Map `DomainException` → `Result` `Conflict` at the handler boundary only (exception, agreed with owner: when the rule broken is about input details, e.g. BR-1 in `RaiseNcr`, map to `Validation` so A1 gets a field error)
 - [ ] Unit tests with hand-written in-memory fakes (no mocking library) for every handler: success, not found, forbidden, conflict
 - [ ] `docs/adr/0002-business-rules-live-in-the-domain.md`, `0005-exceptions-inside-results-at-the-boundary.md`
 
