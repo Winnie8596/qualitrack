@@ -24,6 +24,14 @@ internal static class Ncrs
         return ncr;
     }
 
+    /// <summary>Root cause recorded and one corrective action, not yet completed.</summary>
+    public static NonConformance ActionInProgress(UserId investigator)
+    {
+        var ncr = Investigating(investigator);
+        ncr.PlanFix("Wrong electrode for the steel grade", ["Grind out the weld"], new AuditStamp(investigator, RaisedAt.AddHours(2)));
+        return ncr;
+    }
+
     public static NonConformance Cancelled()
     {
         var ncr = Open();
