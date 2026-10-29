@@ -4,4 +4,9 @@
     <TargetFramework>net10.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <!-- Lets tests exercise members only the aggregate may call (e.g. CorrectiveAction.Complete) -->
+    <InternalsVisibleTo Include="QualiTrack.Domain.Tests" />
+  </ItemGroup>
+
 </Project>
