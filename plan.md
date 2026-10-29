@@ -166,7 +166,7 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 - [x] Unit tests with hand-written in-memory fakes (no mocking library) for every command handler: success, not found, forbidden, conflict
 - [x] `docs/adr/0002-business-rules-live-in-the-domain.md`, `0005-exceptions-inside-results-at-the-boundary.md`
 
-Queries (`GetNcrById`, `ListNcrs`, `GetDashboard`) moved to the Phase 4 slices that first need them, so their shape follows the page that uses them.
+Queries (`GetNcrById`, `ListNcrs`, `GetDashboard`) moved to the slices that first need them, so their shape follows the page that uses them.
 
 **Done when:** every command handler has success + failure tests; Application references only Domain and `Microsoft.Extensions.DependencyInjection.Abstractions`.
 
@@ -174,7 +174,7 @@ Queries (`GetNcrById`, `ListNcrs`, `GetDashboard`) moved to the Phase 4 slices t
 
 ## How Phases 3–5 work (vertical slices, agreed with owner)
 
-From here, features are built as **vertical slices**: one user-visible feature at a time, through every layer (handler → persistence → endpoint → page), before the next starts. Phase 3 builds once what no single feature owns. Each Phase 4 slice is one PR.
+From here, features are built as **vertical slices**: one user-visible feature at a time, through every layer (handler → persistence → endpoint → page), before the next starts. There is no separate foundations phase: each slice builds the shared pieces it is the first to need, and later slices reuse them. Each slice is one PR (or a short stack of PRs).
 
 **A slice is done when:**
 
@@ -186,48 +186,53 @@ From here, features are built as **vertical slices**: one user-visible feature a
 
 ---
 
-## Phase 3 — Foundations
+## Phase 3 — Slice S1: raise and view an NCR (A1, D2 without photo, E1)
 
-Goal: a user can log in as each demo role and reach an empty, protected page; nothing feature-specific yet.
+Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is the first slice, so it also builds the shared pieces every later slice reuses.
 
 ### Persistence
 
 - [ ] `QualiTrackDbContext` with EF Core + Npgsql; configurations in separate `IEntityTypeConfiguration<T>` classes
-- [ ] Map the `NonConformance` aggregate: value objects (`UserId`, `NcrNumber`, `NcrDetails`) via conversions/owned types; private backing fields for actions and history; private parameterless constructors only where EF requires them
-- [ ] Unique index on NCR number
+- [ ] Map the `NonConformance` aggregate: value objects (`UserId`, `NcrNumber`, `NcrDetails`) via conversions/owned types; private backing fields for actions and history; private parameterless constructors only where EF requires them; unique index on NCR number
 - [ ] `NcrRepository`, `UnitOfWork`, `SystemClock`
+- [ ] `NcrNumberGenerator` safe under concurrency (per-year sequence table updated in a transaction)
 - [ ] Initial migration; apply automatically in Development only
-- [ ] Testcontainers PostgreSQL fixture; round-trip test: save/load preserves actions and history
+- [ ] Testcontainers PostgreSQL: save/load round-trip preserves actions and history; two concurrent raises get different numbers
 - [ ] `docs/adr/0004-testcontainers-over-in-memory-database.md`
 
-### Authentication and API pipeline
+### Authentication
 
 - [ ] ASP.NET Core Identity on PostgreSQL; cookie auth (`HttpOnly`, `Secure`, `SameSite=Strict`); return `401/403` instead of redirects for `/api/*`
 - [ ] Seed three roles and one demo user per role (Development only; passwords from config)
 - [ ] `ICurrentUser` from `HttpContext`; `IUserDirectory` over Identity
 - [ ] `/api/auth/login`, `/api/auth/logout`, `/api/auth/me` with integration tests (incl. 401); rate limiting on login
-- [ ] `Result` → ProblemDetails mapping in one place; endpoints grouped with `MapGroup`, each with `.RequireAuthorization(policy)`
-- [ ] Antiforgery (CSRF) for cookie-authenticated writes; test that a write without the token is rejected
-- [ ] Security headers (CSP, `X-Content-Type-Options`, `Referrer-Policy`); correlation ID middleware + structured request logging
 - [ ] `docs/adr/0006-cookie-auth-over-jwt.md`, comparing cookie sessions with JWT (storage, CSRF/XSS exposure, revocation)
+
+### API
+
+- [ ] `Result` → ProblemDetails mapping in one place; endpoints grouped with `MapGroup`, each with `.RequireAuthorization(policy)`
+- [ ] `GetNcrById` query (response DTO, never the entity)
+- [ ] `POST /api/ncrs`, `GET /api/ncrs/{id}`; request DTOs validated; integration tests: 201, 400, 401, 403, 404
+- [ ] Antiforgery (CSRF) for cookie-authenticated writes; test that a write without the token is rejected
+- [ ] Security headers (CSP, `X-Content-Type-Options`, `Referrer-Policy`) on every response
 
 ### Web
 
 - [ ] Tailwind CSS (ADR 0007 records the choice); app layout with semantic landmarks
 - [ ] Routing, auth context from `/api/auth/me`, protected routes per role
 - [ ] Typed API client (`web/src/api/`) using `fetch` + TanStack Query; ProblemDetails surfaced as form/field errors
-- [ ] Login page with a component test
+- [ ] Login page; Raise NCR form (React Hook Form + Zod); NCR detail page with status badge
+- [ ] Component tests for the login form, raise form and status badge (Vitest + Testing Library)
 
-**Done when:** each demo user can log in and out in the browser; unauthenticated API calls get 401; writes without an antiforgery token are rejected; security headers are on every response; persistence tests pass in CI (Docker on `ubuntu-latest`).
+**Done when:** the slice definition of done holds; an Inspector can log in, raise an NCR and see it in the browser; unauthenticated calls get 401; writes without an antiforgery token are rejected; security headers are on every response; Testcontainers tests pass in CI (Docker on `ubuntu-latest`).
 
 ---
 
-## Phase 4 — Feature slices
+## Phase 4 — Slices S2–S7
 
-Goal: each slice leaves one more user story working end to end. Do them in order; see "A slice is done when" above.
+Goal: each slice leaves one more user story working end to end. Do them in order.
 
-- [ ] **S1 — Raise and view an NCR** (A1, D2 without photo): `GetNcrById` query; `NcrNumberGenerator` safe under concurrency (per-year sequence table updated in a transaction) with a test that two concurrent raises get different numbers; `POST /api/ncrs`, `GET /api/ncrs/{id}`; Raise NCR form (React Hook Form + Zod) with component test; NCR detail page; status badge component test
-- [ ] **S2 — NCR list** (D1): `ListNcrs` (filters, sort, paging, role visibility); indexes on `Status`, `DueDate`, `InvestigatorId`, `RaisedBy`; `EXPLAIN ANALYZE` with 10,000 seeded rows before and after indexes in `docs/learning/sql-indexes.md`; test that the list issues a single SQL query (no N+1); list page with filters, sort, paging, overdue badge
+- [ ] **S2 — NCR list** (D1): `ListNcrs` (filters, sort, paging, role visibility); indexes on `Status`, `DueDate`, `InvestigatorId`, `RaisedBy`; `EXPLAIN ANALYZE` with 10,000 seeded rows before and after indexes in `docs/learning/sql-indexes.md`; test that the list issues a single SQL query (no N+1); list page with filters, sort, paging, overdue badge; correlation ID middleware + structured request logging
 - [ ] **S3 — Triage** (A2, A3): `/assign`, `/cancel`; assign and cancel controls on the detail page for QA managers
 - [ ] **S4 — Investigator work** (B1–B3): `/plan-fix`, `/actions`, `/actions/{actionId}/complete`, `/submit`; plan-fix form, action list, history timeline
 - [ ] **S5 — Verification** (C1, C2): `/verify`, `/reject`; HTTP integration test for the full lifecycle Open → Closed; Playwright smoke test: log in as each role and run the lifecycle
