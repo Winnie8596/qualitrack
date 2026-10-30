@@ -236,7 +236,7 @@ Goal: each slice leaves one more user story working end to end. Do them in order
 - [x] **S3 — Triage** (A2, A3): `/assign`, `/cancel`; assign and cancel controls on the detail page for QA managers (also `GET /api/users/investigators` for the assign form's picker)
 - [x] **S4 — Investigator work** (B1–B3): `/plan-fix`, `/actions`, `/actions/{actionId}/complete`, `/submit`; plan-fix form, action list, history timeline
 - [x] **S5 — Verification** (C1, C2): `/verify`, `/reject`; HTTP integration test for the full lifecycle Open → Closed; Playwright smoke test: log in as each role and run the lifecycle
-- [ ] **S6 — Dashboard** (D3): `GetDashboard` tested with seeded data; `/api/dashboard`; Redis in `docker-compose.yml` with `IDistributedCache` (cache-aside, 60 s TTL, invalidated when an NCR changes status, falls back to the database if Redis is down); dashboard page
+- [x] **S6 — Dashboard** (D3): `GetDashboard` tested with seeded data; `/api/dashboard`; Redis in `docker-compose.yml` with `IDistributedCache` (cache-aside, 60 s TTL, invalidated when an NCR changes status, falls back to the database if Redis is down); dashboard page
 - [ ] **S7 — Photo** (A1, D2): `LocalFileStore`; JPEG/PNG only, max 5 MB; upload on the raise form, shown on the detail page
 
 **Done when:** every slice meets the slice definition of done; OpenAPI lists every endpoint; the full lifecycle passes over HTTP and in Playwright.
