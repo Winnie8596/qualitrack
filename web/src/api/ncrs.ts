@@ -128,3 +128,28 @@ export function cancelNcr(id: string, reason: string): Promise<void> {
 
 /** Every cached NCR and list page, which a command on any NCR may have changed. */
 export const allNcrsQueryKey = ['ncrs'] as const
+
+export type PlanFixRequest = {
+  rootCause: string
+  actions: string[]
+}
+
+/** B1: the root cause and the first corrective actions; the NCR becomes ActionInProgress. */
+export function planFix(id: string, request: PlanFixRequest): Promise<void> {
+  return postCommand(`/api/ncrs/${encodeURIComponent(id)}/plan-fix`, request)
+}
+
+/** B2: one more corrective action while actions are in progress. */
+export function addCorrectiveAction(id: string, description: string): Promise<void> {
+  return postCommand(`/api/ncrs/${encodeURIComponent(id)}/actions`, { description })
+}
+
+/** B2: the action is stamped as completed now, by the caller. */
+export function completeCorrectiveAction(id: string, actionId: string): Promise<void> {
+  return postCommand(`/api/ncrs/${encodeURIComponent(id)}/actions/${encodeURIComponent(actionId)}/complete`, {})
+}
+
+/** B3: allowed once every action is completed (BR-4); the NCR becomes PendingVerification. */
+export function submitForVerification(id: string): Promise<void> {
+  return postCommand(`/api/ncrs/${encodeURIComponent(id)}/submit`, {})
+}
