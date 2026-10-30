@@ -1,17 +1,16 @@
 using System.Net;
 using System.Net.Http.Json;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using QualiTrack.Api.Http;
 
 namespace QualiTrack.Api.IntegrationTests.Ncrs;
 
 [Collection(ApiCollection.Name)]
 public sealed class NcrEndpointsTests(QualiTrackApiFactory api)
 {
+    private readonly NcrApi _api = new(api);
+
     [Fact]
     public async Task An_inspector_who_raises_an_ncr_gets_201_and_can_open_it()
     {
@@ -201,64 +200,25 @@ public sealed class NcrEndpointsTests(QualiTrackApiFactory api)
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
-    private const string Inspector = "inspector@qualitrack.demo";
-    private const string Investigator = "investigator@qualitrack.demo";
-    private const string QaManager = "qamanager@qualitrack.demo";
-    private const string Password = "Correct-Horse-9";
+    private const string Inspector = NcrApi.Inspector;
+    private const string Investigator = NcrApi.Investigator;
+    private const string QaManager = NcrApi.QaManager;
 
-    // The session cookie is Secure, so the client only sends it back over HTTPS
-    private static readonly Uri _https = new("https://localhost");
+    private HttpClient Client() => _api.Anonymous();
 
-    private HttpClient Client() => api.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = _https });
+    private static Dictionary<string, object?> ValidRequest(string description = "Sharp burr on the mating face.") =>
+        NcrApi.RaiseRequest(description);
 
-    // A dictionary rather than a record, so a test can blank a field or give it a value of the wrong type
-    private static Dictionary<string, object?> ValidRequest(
-        string description = "Sharp burr on the mating face.", string severity = "Major") =>
-        new()
-        {
-            ["title"] = "Burr on flange",
-            ["description"] = description,
-            ["location"] = "Line 3",
-            ["severity"] = severity,
-        };
+    private Task<(HttpClient Client, Guid UserId)> SignedInAsync(string email) => _api.SignedInAsync(email);
 
-    private async Task<(HttpClient Client, Guid UserId)> SignedInAsync(string email)
-    {
-        var client = Client();
-        var password = email.EndsWith("@qualitrack.demo", StringComparison.Ordinal) ? QualiTrackApiFactory.DemoPassword : Password;
-        var login = await client.PostAsJsonAsync("/api/auth/login", new { email, password });
-        login.EnsureSuccessStatusCode();
-
-        // As the web app does: the token belongs to the session, so it is fetched after logging in
-        var antiforgery = await client.GetFromJsonAsync<AntiforgeryToken>("/api/auth/antiforgery");
-        client.DefaultRequestHeaders.Add(AntiforgeryProtection.HeaderName, antiforgery!.Token);
-
-        return (client, (await login.Content.ReadFromJsonAsync<SignedInUser>())!.Id);
-    }
+    private Task<string> CreateInspectorAsync() => _api.CreateUserAsync("Inspector");
 
     private async Task<Uri> RaiseAsync() => await RaiseAsync((await SignedInAsync(Inspector)).Client);
 
-    private static async Task<Uri> RaiseAsync(HttpClient client, string severity = "Major")
-    {
-        var response = await client.PostAsJsonAsync("/api/ncrs", ValidRequest(severity: severity));
-        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
-        return response.Headers.Location!;
-    }
+    private static async Task<Uri> RaiseAsync(HttpClient client, string severity = "Major") =>
+        new($"/api/ncrs/{await NcrApi.RaiseAsync(client, severity)}", UriKind.Relative);
 
     private static Guid IdOf(Uri location) => Guid.Parse(location.OriginalString.Split('/')[^1]);
-
-    // An inspector other than the demo one, to show inspectors only see the NCRs they raised
-    private async Task<string> CreateInspectorAsync()
-    {
-        _ = api.Server;
-        var email = $"{Guid.NewGuid()}@qualitrack.test";
-        await using var scope = api.Services.CreateAsyncScope();
-        var users = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<Guid>>>();
-        var user = new IdentityUser<Guid> { UserName = email, Email = email };
-        Assert.True((await users.CreateAsync(user, Password)).Succeeded);
-        Assert.True((await users.AddToRoleAsync(user, "Inspector")).Succeeded);
-        return email;
-    }
 
     private async Task<int> CountNcrsDescribedAsAsync(string description)
     {

@@ -24,6 +24,16 @@ public sealed record RaiseNcrRequest(
 
 public sealed record RaisedNcrResponse(Guid Id);
 
+/// <summary>Assign an investigator and due date (A2). Nullable for the same reason as <see cref="RaiseNcrRequest"/>.</summary>
+public sealed record AssignInvestigatorRequest([Required] Guid? InvestigatorId, [Required] DateTimeOffset? DueDate)
+{
+    // "!" is safe: validation has rejected a request with either missing before the endpoint runs
+    public AssignInvestigatorCommand ToCommand(Guid ncrId) => new(ncrId, InvestigatorId!.Value, DueDate!.Value);
+}
+
+/// <summary>A reason, which cancelling (A3) and rejecting (C2) both require (BR-7).</summary>
+public sealed record ReasonRequest([Required] string? Reason);
+
 /// <summary>
 /// The list's filters, sort and page from the query string (D1), e.g. <c>?status=Open&amp;sortBy=DueDate</c>.
 /// Enum values are their names, as in JSON; a value that is not one of them is a 400.
@@ -53,7 +63,13 @@ public sealed record ListNcrsRequest(
 public static class NcrEndpoints
 {
     public static IServiceCollection AddNcrUseCases(this IServiceCollection services) =>
-        services.AddScoped<RaiseNcrHandler>().AddScoped<GetNcrByIdHandler>().AddScoped<ListNcrsHandler>();
+        services
+            .AddScoped<NcrCommandRunner>()
+            .AddScoped<RaiseNcrHandler>()
+            .AddScoped<GetNcrByIdHandler>()
+            .AddScoped<ListNcrsHandler>()
+            .AddScoped<AssignInvestigatorHandler>()
+            .AddScoped<CancelNcrHandler>();
 
     public static IEndpointRouteBuilder MapNcrEndpoints(this IEndpointRouteBuilder endpoints)
     {
@@ -61,6 +77,8 @@ public static class NcrEndpoints
         ncrs.MapGet("/", ListAsync);
         ncrs.MapPost("/", RaiseAsync);
         ncrs.MapGet("/{id:guid}", GetByIdAsync);
+        ncrs.MapPost("/{id:guid}/assign", AssignAsync);
+        ncrs.MapPost("/{id:guid}/cancel", CancelAsync);
         return endpoints;
     }
 
@@ -83,4 +101,13 @@ public static class NcrEndpoints
         var result = await handler.HandleAsync(new GetNcrByIdQuery(id), cancellationToken);
         return result.ToHttpResult(TypedResults.Ok);
     }
+
+    private static async Task<IResult> AssignAsync(
+        Guid id, AssignInvestigatorRequest request, AssignInvestigatorHandler handler, CancellationToken cancellationToken) =>
+        (await handler.HandleAsync(request.ToCommand(id), cancellationToken)).ToHttpResult();
+
+    // "!" is safe: validation has rejected a request with no reason before the endpoint runs
+    private static async Task<IResult> CancelAsync(
+        Guid id, ReasonRequest request, CancelNcrHandler handler, CancellationToken cancellationToken) =>
+        (await handler.HandleAsync(new CancelNcrCommand(id, request.Reason!), cancellationToken)).ToHttpResult();
 }
