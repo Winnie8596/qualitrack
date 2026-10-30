@@ -6,10 +6,12 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   server: {
-    // Same-origin calls in development, so the session cookie is sent; the API's http launch profile listens on 5097.
+    // Same-origin calls in development, so the session cookie is sent. The target is the API's https launch profile:
+    // its cookies are Secure-only, and antiforgery refuses to issue or check a token on a plain-HTTP request.
+    // secure: false accepts the ASP.NET Core development certificate without it being trusted by Node.
     proxy: {
-      '/api': 'http://localhost:5097',
-      '/health': 'http://localhost:5097',
+      '/api': { target: 'https://localhost:7178', secure: false },
+      '/health': { target: 'https://localhost:7178', secure: false },
     },
   },
   test: {
