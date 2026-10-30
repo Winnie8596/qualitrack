@@ -1,6 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using QualiTrack.Api.Authentication;
 using QualiTrack.Api.Http;
+using QualiTrack.Application.Abstractions;
 using QualiTrack.Application.NonConformances;
 using QualiTrack.Domain.NonConformances;
 
@@ -23,18 +24,51 @@ public sealed record RaiseNcrRequest(
 
 public sealed record RaisedNcrResponse(Guid Id);
 
+/// <summary>
+/// The list's filters, sort and page from the query string (D1), e.g. <c>?status=Open&amp;sortBy=DueDate</c>.
+/// Enum values are their names, as in JSON; a value that is not one of them is a 400.
+/// </summary>
+public sealed record ListNcrsRequest(
+    NcrStatus? Status,
+    Severity? Severity,
+    bool? OverdueOnly,
+    NcrSortField? SortBy,
+    SortDirection? Direction,
+    int? Page)
+{
+    public ListNcrsQuery ToQuery()
+    {
+        var defaults = new ListNcrsQuery();
+        return new(
+            Status,
+            Severity,
+            OverdueOnly ?? defaults.OverdueOnly,
+            SortBy ?? defaults.SortBy,
+            Direction ?? defaults.Direction,
+            Page ?? defaults.Page);
+    }
+}
+
 /// <summary>Raise an NCR and open one (A1, D2). Which role may do either is decided by the handler.</summary>
 public static class NcrEndpoints
 {
     public static IServiceCollection AddNcrUseCases(this IServiceCollection services) =>
-        services.AddScoped<RaiseNcrHandler>().AddScoped<GetNcrByIdHandler>();
+        services.AddScoped<RaiseNcrHandler>().AddScoped<GetNcrByIdHandler>().AddScoped<ListNcrsHandler>();
 
     public static IEndpointRouteBuilder MapNcrEndpoints(this IEndpointRouteBuilder endpoints)
     {
         var ncrs = endpoints.MapGroup("/api/ncrs").RequireAuthorization(Policies.SignedIn).RequireAntiforgeryToken();
+        ncrs.MapGet("/", ListAsync);
         ncrs.MapPost("/", RaiseAsync);
         ncrs.MapGet("/{id:guid}", GetByIdAsync);
         return endpoints;
+    }
+
+    private static async Task<IResult> ListAsync(
+        [AsParameters] ListNcrsRequest request, ListNcrsHandler handler, CancellationToken cancellationToken)
+    {
+        var result = await handler.HandleAsync(request.ToQuery(), cancellationToken);
+        return result.ToHttpResult(TypedResults.Ok);
     }
 
     private static async Task<IResult> RaiseAsync(
