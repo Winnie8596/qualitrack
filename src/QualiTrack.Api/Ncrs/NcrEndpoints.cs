@@ -83,7 +83,9 @@ public static class NcrEndpoints
             .AddScoped<PlanFixHandler>()
             .AddScoped<AddCorrectiveActionHandler>()
             .AddScoped<CompleteCorrectiveActionHandler>()
-            .AddScoped<SubmitForVerificationHandler>();
+            .AddScoped<SubmitForVerificationHandler>()
+            .AddScoped<VerifyNcrHandler>()
+            .AddScoped<RejectVerificationHandler>();
 
     public static IEndpointRouteBuilder MapNcrEndpoints(this IEndpointRouteBuilder endpoints)
     {
@@ -97,6 +99,8 @@ public static class NcrEndpoints
         ncrs.MapPost("/{id:guid}/actions", AddActionAsync);
         ncrs.MapPost("/{id:guid}/actions/{actionId:guid}/complete", CompleteActionAsync);
         ncrs.MapPost("/{id:guid}/submit", SubmitAsync);
+        ncrs.MapPost("/{id:guid}/verify", VerifyAsync);
+        ncrs.MapPost("/{id:guid}/reject", RejectAsync);
         return endpoints;
     }
 
@@ -145,4 +149,12 @@ public static class NcrEndpoints
     private static async Task<IResult> SubmitAsync(
         Guid id, SubmitForVerificationHandler handler, CancellationToken cancellationToken) =>
         (await handler.HandleAsync(new SubmitForVerificationCommand(id), cancellationToken)).ToHttpResult();
+
+    private static async Task<IResult> VerifyAsync(Guid id, VerifyNcrHandler handler, CancellationToken cancellationToken) =>
+        (await handler.HandleAsync(new VerifyNcrCommand(id), cancellationToken)).ToHttpResult();
+
+    // "!" is safe: validation has rejected a request with no reason before the endpoint runs
+    private static async Task<IResult> RejectAsync(
+        Guid id, ReasonRequest request, RejectVerificationHandler handler, CancellationToken cancellationToken) =>
+        (await handler.HandleAsync(new RejectVerificationCommand(id, request.Reason!), cancellationToken)).ToHttpResult();
 }
