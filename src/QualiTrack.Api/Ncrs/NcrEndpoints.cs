@@ -31,6 +31,16 @@ public sealed record AssignInvestigatorRequest([Required] Guid? InvestigatorId, 
     public AssignInvestigatorCommand ToCommand(Guid ncrId) => new(ncrId, InvestigatorId!.Value, DueDate!.Value);
 }
 
+/// <summary>Plan the fix (B1): the root cause and the first corrective actions. The domain requires at least one.</summary>
+public sealed record PlanFixRequest([Required] string? RootCause, [Required] IReadOnlyList<string>? Actions)
+{
+    // "!" is safe: validation has rejected a request with either missing before the endpoint runs
+    public PlanFixCommand ToCommand(Guid ncrId) => new(ncrId, RootCause!, Actions!);
+}
+
+/// <summary>One more corrective action (B2), e.g. after a rejected verification.</summary>
+public sealed record AddCorrectiveActionRequest([Required] string? Description);
+
 /// <summary>A reason, which cancelling (A3) and rejecting (C2) both require (BR-7).</summary>
 public sealed record ReasonRequest([Required] string? Reason);
 
@@ -69,7 +79,11 @@ public static class NcrEndpoints
             .AddScoped<GetNcrByIdHandler>()
             .AddScoped<ListNcrsHandler>()
             .AddScoped<AssignInvestigatorHandler>()
-            .AddScoped<CancelNcrHandler>();
+            .AddScoped<CancelNcrHandler>()
+            .AddScoped<PlanFixHandler>()
+            .AddScoped<AddCorrectiveActionHandler>()
+            .AddScoped<CompleteCorrectiveActionHandler>()
+            .AddScoped<SubmitForVerificationHandler>();
 
     public static IEndpointRouteBuilder MapNcrEndpoints(this IEndpointRouteBuilder endpoints)
     {
@@ -79,6 +93,10 @@ public static class NcrEndpoints
         ncrs.MapGet("/{id:guid}", GetByIdAsync);
         ncrs.MapPost("/{id:guid}/assign", AssignAsync);
         ncrs.MapPost("/{id:guid}/cancel", CancelAsync);
+        ncrs.MapPost("/{id:guid}/plan-fix", PlanFixAsync);
+        ncrs.MapPost("/{id:guid}/actions", AddActionAsync);
+        ncrs.MapPost("/{id:guid}/actions/{actionId:guid}/complete", CompleteActionAsync);
+        ncrs.MapPost("/{id:guid}/submit", SubmitAsync);
         return endpoints;
     }
 
@@ -110,4 +128,21 @@ public static class NcrEndpoints
     private static async Task<IResult> CancelAsync(
         Guid id, ReasonRequest request, CancelNcrHandler handler, CancellationToken cancellationToken) =>
         (await handler.HandleAsync(new CancelNcrCommand(id, request.Reason!), cancellationToken)).ToHttpResult();
+
+    private static async Task<IResult> PlanFixAsync(
+        Guid id, PlanFixRequest request, PlanFixHandler handler, CancellationToken cancellationToken) =>
+        (await handler.HandleAsync(request.ToCommand(id), cancellationToken)).ToHttpResult();
+
+    // "!" is safe: validation has rejected a request with no description before the endpoint runs
+    private static async Task<IResult> AddActionAsync(
+        Guid id, AddCorrectiveActionRequest request, AddCorrectiveActionHandler handler, CancellationToken cancellationToken) =>
+        (await handler.HandleAsync(new AddCorrectiveActionCommand(id, request.Description!), cancellationToken)).ToHttpResult();
+
+    private static async Task<IResult> CompleteActionAsync(
+        Guid id, Guid actionId, CompleteCorrectiveActionHandler handler, CancellationToken cancellationToken) =>
+        (await handler.HandleAsync(new CompleteCorrectiveActionCommand(id, actionId), cancellationToken)).ToHttpResult();
+
+    private static async Task<IResult> SubmitAsync(
+        Guid id, SubmitForVerificationHandler handler, CancellationToken cancellationToken) =>
+        (await handler.HandleAsync(new SubmitForVerificationCommand(id), cancellationToken)).ToHttpResult();
 }

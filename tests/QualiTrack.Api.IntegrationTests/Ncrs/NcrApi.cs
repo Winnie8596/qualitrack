@@ -81,6 +81,39 @@ internal sealed class NcrApi(QualiTrackApiFactory api)
         return id;
     }
 
+    /// <summary>Assigned to the demo investigator, who has planned the fix with two corrective actions.</summary>
+    public async Task<Guid> ActionInProgressAsync()
+    {
+        var id = await InvestigatingAsync();
+        var (investigator, _) = await SignedInAsync(Investigator);
+        var response = await investigator.PostAsJsonAsync($"/api/ncrs/{id}/plan-fix", PlanFixRequest());
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        return id;
+    }
+
+    /// <summary>Every corrective action completed, and submitted by the demo investigator.</summary>
+    public async Task<Guid> PendingVerificationAsync()
+    {
+        var id = await ActionInProgressAsync();
+        var (investigator, _) = await SignedInAsync(Investigator);
+        foreach (var action in (await GetAsync(id)).Actions)
+        {
+            var completed = await investigator.PostAsync($"/api/ncrs/{id}/actions/{action.Id}/complete", null);
+            Assert.Equal(HttpStatusCode.NoContent, completed.StatusCode);
+        }
+
+        var submitted = await investigator.PostAsync($"/api/ncrs/{id}/submit", null);
+        Assert.Equal(HttpStatusCode.NoContent, submitted.StatusCode);
+        return id;
+    }
+
+    public static Dictionary<string, object?> PlanFixRequest() =>
+        new()
+        {
+            ["rootCause"] = "Deburring step skipped on night shift",
+            ["actions"] = new[] { "Deburr the flange", "Add deburring to the shift checklist" },
+        };
+
     public static Dictionary<string, object?> AssignRequest(Guid investigatorId, int dueInDays = 5) =>
         new()
         {
