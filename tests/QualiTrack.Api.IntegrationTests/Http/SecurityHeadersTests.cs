@@ -62,5 +62,8 @@ public sealed class SecurityHeadersTests(QualiTrackApiFactory api)
 
         public Task<NonConformance?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
             throw new InvalidOperationException("The database is down.");
+
+        public Task<IReadOnlyList<NonConformance>> ListAsync(NcrListCriteria criteria, CancellationToken cancellationToken) =>
+            throw new InvalidOperationException("The database is down.");
     }
 }
