@@ -40,6 +40,9 @@ if (app.Environment.IsDevelopment())
     await app.Services.SeedDemoUsersAsync();
 }
 
+// First, so every response gets them, whatever later in the pipeline answers it
+app.UseSecurityHeaders();
+
 // Every error is ProblemDetails (PRD §8): an unhandled exception becomes a 500 without its stack trace, and an
 // error with no body of its own (401 from the cookie, 404 for an unknown route) gets one
 app.UseExceptionHandler();
