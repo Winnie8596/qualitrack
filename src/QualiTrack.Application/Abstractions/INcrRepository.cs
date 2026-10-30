@@ -7,5 +7,7 @@ public interface INcrRepository
     /// <returns>The NCR, or <c>null</c> when none has this id; the handler turns that into a NotFound result.</returns>
     Task<NonConformance?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
+    Task<IReadOnlyList<NonConformance>> ListAsync(NcrListCriteria criteria, CancellationToken cancellationToken);
+
     void Add(NonConformance ncr);
 }

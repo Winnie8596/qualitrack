@@ -1,4 +1,5 @@
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.HttpLogging;
 using QualiTrack.Api.Authentication;
 using QualiTrack.Api.Http;
 using QualiTrack.Api.Ncrs;
@@ -23,6 +24,15 @@ builder.Services.Configure<RouteHandlerOptions>(options => options.ThrowOnBadReq
 builder.Services.ConfigureHttpJsonOptions(options =>
     options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(allowIntegerValues: false)));
 builder.Services.AddHealthChecks();
+
+// One structured log entry per request, written when it ends, with its duration (the category is enabled in
+// appsettings). No headers, query string or bodies: they can hold cookies and personal data.
+builder.Services.AddHttpLogging(options =>
+{
+    options.LoggingFields = HttpLoggingFields.RequestMethod | HttpLoggingFields.RequestPath
+        | HttpLoggingFields.ResponseStatusCode | HttpLoggingFields.Duration;
+    options.CombineLogs = true;
+});
 builder.Services.AddPersistence(connectionString);
 builder.Services.AddCookieAuthentication();
 builder.Services.AddLoginRateLimit(builder.Configuration);
@@ -42,6 +52,8 @@ if (app.Environment.IsDevelopment())
 
 // First, so every response gets them, whatever later in the pipeline answers it
 app.UseSecurityHeaders();
+app.UseCorrelationId();
+app.UseHttpLogging();
 
 // Every error is ProblemDetails (PRD §8): an unhandled exception becomes a 500 without its stack trace, and an
 // error with no body of its own (401 from the cookie, 404 for an unknown route) gets one

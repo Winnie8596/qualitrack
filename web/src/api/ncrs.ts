@@ -67,10 +67,41 @@ export type RaiseNcrRequest = {
 
 const raisedNcrSchema = z.object({ id: z.guid() })
 
+// GET /api/ncrs: one page of the API's NcrSummaryView
+const ncrSummarySchema = ncrSchema.pick({
+  id: true,
+  number: true,
+  title: true,
+  severity: true,
+  status: true,
+  raisedAt: true,
+  dueDate: true,
+  isOverdue: true,
+})
+
+export type NcrSummary = z.infer<typeof ncrSummarySchema>
+
+const ncrListPageSchema = z.object({
+  items: z.array(ncrSummarySchema),
+  page: z.number().int(),
+  hasNextPage: z.boolean(),
+})
+
+export type NcrListPage = z.infer<typeof ncrListPageSchema>
+
 export function ncrQueryOptions(id: string) {
   return queryOptions({
     queryKey: ['ncrs', id],
     queryFn: ({ signal }) => getJson(`/api/ncrs/${encodeURIComponent(id)}`, ncrSchema, signal),
+  })
+}
+
+/** One page of the list; `searchParams` are the filters as GET /api/ncrs takes them. */
+export function ncrListQueryOptions(searchParams: URLSearchParams) {
+  const query = searchParams.toString()
+  return queryOptions({
+    queryKey: ['ncrs', 'list', query],
+    queryFn: ({ signal }) => getJson(query ? `/api/ncrs?${query}` : '/api/ncrs', ncrListPageSchema, signal),
   })
 }
 

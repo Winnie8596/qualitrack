@@ -40,6 +40,18 @@ public sealed class OverdueTests
     }
 
     [Theory]
+    [MemberData(nameof(Cases))]
+    public void The_overdue_filter_matches_the_same_ncrs_as_IsOverdue(string state, Func<NonConformance> build, int daysAfterRaised, bool expected)
+    {
+        var ncr = build();
+        var isOverdue = NonConformance.OverdueAt(Ncrs.RaisedAt.AddDays(daysAfterRaised)).Compile();
+
+        var matches = isOverdue(ncr);
+
+        Assert.True(expected == matches, $"{state}: expected the overdue filter to match: {expected}");
+    }
+
+    [Theory]
     [MemberData(nameof(FinishedCases))]
     public void Only_closed_and_cancelled_ncrs_are_finished(string state, Func<NonConformance> build, bool expected)
     {

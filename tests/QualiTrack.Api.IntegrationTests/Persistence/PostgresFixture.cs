@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using QualiTrack.Domain.NonConformances;
 using QualiTrack.Infrastructure.Persistence;
 using Testcontainers.PostgreSql;
@@ -14,8 +15,11 @@ public sealed class PostgresFixture : IAsyncLifetime
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:17-alpine").Build();
     private int _lastSequence;
 
-    public QualiTrackDbContext CreateContext() =>
-        new(new DbContextOptionsBuilder<QualiTrackDbContext>().UseNpgsql(_container.GetConnectionString()).Options);
+    public QualiTrackDbContext CreateContext(params IInterceptor[] interceptors) =>
+        new(new DbContextOptionsBuilder<QualiTrackDbContext>()
+            .UseNpgsql(_container.GetConnectionString())
+            .AddInterceptors(interceptors)
+            .Options);
 
     public NcrNumber NextNumber() => NcrNumber.From(2026, Interlocked.Increment(ref _lastSequence));
 

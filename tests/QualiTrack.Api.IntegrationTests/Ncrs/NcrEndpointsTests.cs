@@ -146,6 +146,61 @@ public sealed class NcrEndpointsTests(QualiTrackApiFactory api)
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
     }
 
+    [Fact]
+    public async Task An_inspector_lists_only_the_ncrs_they_raised_newest_first()
+    {
+        await RaiseAsync();
+        var (client, _) = await SignedInAsync(await CreateInspectorAsync());
+        var first = await RaiseAsync(client);
+        var second = await RaiseAsync(client);
+
+        var response = await client.GetAsync("/api/ncrs");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var page = await response.Content.ReadFromJsonAsync<NcrPage>();
+        Assert.Equal([IdOf(second), IdOf(first)], page!.Items.Select(item => item.Id));
+        Assert.Equal(1, page.Page);
+        Assert.False(page.HasNextPage);
+        Assert.Equal(("Burr on flange", "Major", "Open", false), (page.Items[0].Title, page.Items[0].Severity, page.Items[0].Status, page.Items[0].IsOverdue));
+    }
+
+    [Fact]
+    public async Task The_list_takes_its_filters_sort_and_page_from_the_query_string()
+    {
+        var (client, _) = await SignedInAsync(await CreateInspectorAsync());
+        var critical = await RaiseAsync(client, severity: "Critical");
+        await RaiseAsync(client, severity: "Minor");
+
+        var response = await client.GetAsync(
+            "/api/ncrs?status=Open&severity=Critical&overdueOnly=false&sortBy=DueDate&direction=Ascending&page=1");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        var page = await response.Content.ReadFromJsonAsync<NcrPage>();
+        Assert.Equal([IdOf(critical)], page!.Items.Select(item => item.Id));
+    }
+
+    [Theory]
+    [InlineData("page=0")]
+    [InlineData("status=Lost")]
+    [InlineData("sortBy=Title")]
+    public async Task Listing_with_a_query_value_that_is_not_allowed_gets_400(string queryString)
+    {
+        var (client, _) = await SignedInAsync(QaManager);
+
+        var response = await client.GetAsync($"/api/ncrs?{queryString}");
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+        Assert.Equal("application/problem+json", response.Content.Headers.ContentType?.MediaType);
+    }
+
+    [Fact]
+    public async Task Listing_without_signing_in_gets_401()
+    {
+        var response = await Client().GetAsync("/api/ncrs");
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
     private const string Inspector = "inspector@qualitrack.demo";
     private const string Investigator = "investigator@qualitrack.demo";
     private const string QaManager = "qamanager@qualitrack.demo";
@@ -157,13 +212,14 @@ public sealed class NcrEndpointsTests(QualiTrackApiFactory api)
     private HttpClient Client() => api.CreateClient(new WebApplicationFactoryClientOptions { BaseAddress = _https });
 
     // A dictionary rather than a record, so a test can blank a field or give it a value of the wrong type
-    private static Dictionary<string, object?> ValidRequest(string description = "Sharp burr on the mating face.") =>
+    private static Dictionary<string, object?> ValidRequest(
+        string description = "Sharp burr on the mating face.", string severity = "Major") =>
         new()
         {
             ["title"] = "Burr on flange",
             ["description"] = description,
             ["location"] = "Line 3",
-            ["severity"] = "Major",
+            ["severity"] = severity,
         };
 
     private async Task<(HttpClient Client, Guid UserId)> SignedInAsync(string email)
@@ -180,13 +236,16 @@ public sealed class NcrEndpointsTests(QualiTrackApiFactory api)
         return (client, (await login.Content.ReadFromJsonAsync<SignedInUser>())!.Id);
     }
 
-    private async Task<Uri> RaiseAsync()
+    private async Task<Uri> RaiseAsync() => await RaiseAsync((await SignedInAsync(Inspector)).Client);
+
+    private static async Task<Uri> RaiseAsync(HttpClient client, string severity = "Major")
     {
-        var (client, _) = await SignedInAsync(Inspector);
-        var response = await client.PostAsJsonAsync("/api/ncrs", ValidRequest());
+        var response = await client.PostAsJsonAsync("/api/ncrs", ValidRequest(severity: severity));
         Assert.Equal(HttpStatusCode.Created, response.StatusCode);
         return response.Headers.Location!;
     }
+
+    private static Guid IdOf(Uri location) => Guid.Parse(location.OriginalString.Split('/')[^1]);
 
     // An inspector other than the demo one, to show inspectors only see the NCRs they raised
     private async Task<string> CreateInspectorAsync()
@@ -212,6 +271,10 @@ public sealed class NcrEndpointsTests(QualiTrackApiFactory api)
     private sealed record AntiforgeryToken(string Token);
 
     private sealed record RaisedNcr(Guid Id);
+
+    private sealed record NcrPage(IReadOnlyList<NcrListItem> Items, int Page, bool HasNextPage);
+
+    private sealed record NcrListItem(Guid Id, string Title, string Severity, string Status, bool IsOverdue);
 
     private sealed record NcrDetail(
         Guid Id,

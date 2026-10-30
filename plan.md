@@ -232,7 +232,7 @@ Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is 
 
 Goal: each slice leaves one more user story working end to end. Do them in order.
 
-- [ ] **S2 — NCR list** (D1): `ListNcrs` (filters, sort, paging, role visibility); indexes on `Status`, `DueDate`, `InvestigatorId`, `RaisedBy`; `EXPLAIN ANALYZE` with 10,000 seeded rows before and after indexes in `docs/learning/sql-indexes.md`; test that the list issues a single SQL query (no N+1); list page with filters, sort, paging, overdue badge; correlation ID middleware + structured request logging
+- [x] **S2 — NCR list** (D1): `ListNcrs` (filters, sort, paging, role visibility); indexes on `Status`, `DueDate`, `InvestigatorId`, `RaisedBy`; `EXPLAIN ANALYZE` with 10,000 seeded rows before and after indexes in `docs/learning/sql-indexes.md`; test that the list issues a single SQL query (no N+1); list page with filters, sort, paging, overdue badge; correlation ID middleware + structured request logging
 - [ ] **S3 — Triage** (A2, A3): `/assign`, `/cancel`; assign and cancel controls on the detail page for QA managers
 - [ ] **S4 — Investigator work** (B1–B3): `/plan-fix`, `/actions`, `/actions/{actionId}/complete`, `/submit`; plan-fix form, action list, history timeline
 - [ ] **S5 — Verification** (C1, C2): `/verify`, `/reject`; HTTP integration test for the full lifecycle Open → Closed; Playwright smoke test: log in as each role and run the lifecycle

@@ -1,8 +1,17 @@
+using System.Linq.Expressions;
+
 namespace QualiTrack.Domain.NonConformances;
 
 public sealed class NonConformance
 {
     private static readonly TimeSpan _criticalMaxTimeToDue = TimeSpan.FromDays(7);
+
+    // BR-8, written once as an expression so an NCR can answer it in memory (IsOverdue) and the NCR list can
+    // filter on it in SQL (OverdueAt). With no due date yet, the lifted comparison "now > null" is false.
+    private static readonly Expression<Func<NonConformance, DateTimeOffset, bool>> _overdueRule =
+        (ncr, now) => ncr.Status != NcrStatus.Closed && ncr.Status != NcrStatus.Cancelled && now > ncr.DueDate;
+
+    private static readonly Func<NonConformance, DateTimeOffset, bool> _isOverdue = _overdueRule.Compile();
 
     private readonly List<CorrectiveAction> _actions = [];
     private readonly List<StatusChange> _history = [];
@@ -142,8 +151,17 @@ public sealed class NonConformance
         MoveTo(NcrStatus.Cancelled, stamp, note);
     }
 
-    // BR-8. With no due date yet, the lifted comparison "now > null" is false, so it is not overdue.
-    public bool IsOverdue(DateTimeOffset now) => !IsFinished && now > DueDate;
+    public bool IsOverdue(DateTimeOffset now) => _isOverdue(this, now);
+
+    /// <summary>BR-8 as a filter a query provider such as EF Core can translate.</summary>
+    public static Expression<Func<NonConformance, bool>> OverdueAt(DateTimeOffset now)
+    {
+        // Reading "now" from a closure, not a constant, lets EF Core send it as a SQL parameter
+        Expression<Func<DateTimeOffset>> captured = () => now;
+        var ncr = _overdueRule.Parameters[0];
+        var body = new ParameterReplacer(_overdueRule.Parameters[1], captured.Body).Visit(_overdueRule.Body);
+        return Expression.Lambda<Func<NonConformance, bool>>(body, ncr);
+    }
 
     // BR-7: every change after Raise goes through here, so no transition can skip the audit trail
     private void MoveTo(NcrStatus to, AuditStamp stamp, string? note = null)
@@ -176,5 +194,11 @@ public sealed class NonConformance
         {
             throw DomainException.NotPermitted("The investigator cannot verify their own fix.");
         }
+    }
+
+    private sealed class ParameterReplacer(ParameterExpression parameter, Expression replacement) : ExpressionVisitor
+    {
+        protected override Expression VisitParameter(ParameterExpression node) =>
+            node == parameter ? replacement : base.VisitParameter(node);
     }
 }

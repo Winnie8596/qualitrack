@@ -6,6 +6,7 @@ import DateTime from './DateTime.tsx'
 import DetailRow from './DetailRow.tsx'
 import { statusLabels } from './labels.ts'
 import NcrNotFound from './NcrNotFound.tsx'
+import OverdueBadge from './OverdueBadge.tsx'
 import SeverityBadge from './SeverityBadge.tsx'
 import StatusBadge from './StatusBadge.tsx'
 
@@ -66,8 +67,8 @@ function NcrDetail({ id, currentUserId }: NcrDetailProps) {
           <DetailRow term="Due">
             {ncr.dueDate ? <DateTime iso={ncr.dueDate} /> : 'Not set'}
             {ncr.isOverdue && (
-              <span className="ml-2 inline-block rounded-full bg-red-100 px-2.5 py-0.5 text-sm font-medium text-red-900 ring-1 ring-red-300">
-                Overdue
+              <span className="ml-2">
+                <OverdueBadge />
               </span>
             )}
           </DetailRow>

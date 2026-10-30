@@ -353,8 +353,14 @@ namespace QualiTrack.Infrastructure.Persistence.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DueDate");
+
+                    b.HasIndex("InvestigatorId");
+
                     b.HasIndex("Number")
                         .IsUnique();
+
+                    b.HasIndex("Status");
 
                     b.ToTable("NonConformances");
                 });

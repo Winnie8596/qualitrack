@@ -34,6 +34,11 @@ function AppLayout() {
                       Home
                     </NavLink>
                   </li>
+                  <li>
+                    <NavLink to="/ncrs" end className={navLinkClass}>
+                      NCRs
+                    </NavLink>
+                  </li>
                   {auth.user.role === 'Inspector' && (
                     <li>
                       <NavLink to="/ncrs/new" className={navLinkClass}>
