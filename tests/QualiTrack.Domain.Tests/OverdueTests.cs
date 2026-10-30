@@ -53,6 +53,18 @@ public sealed class OverdueTests
 
     [Theory]
     [MemberData(nameof(FinishedCases))]
+    public void The_unfinished_filter_matches_every_ncr_that_is_not_finished(string state, Func<NonConformance> build, bool isFinished)
+    {
+        var ncr = build();
+        var isUnfinished = NonConformance.Unfinished.Compile();
+
+        var matches = isUnfinished(ncr);
+
+        Assert.True(matches != isFinished, $"{state}: expected the unfinished filter to match: {!isFinished}");
+    }
+
+    [Theory]
+    [MemberData(nameof(FinishedCases))]
     public void Only_closed_and_cancelled_ncrs_are_finished(string state, Func<NonConformance> build, bool expected)
     {
         var ncr = build();

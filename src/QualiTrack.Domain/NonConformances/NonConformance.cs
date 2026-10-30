@@ -6,10 +6,17 @@ public sealed class NonConformance
 {
     private static readonly TimeSpan _criticalMaxTimeToDue = TimeSpan.FromDays(7);
 
-    // BR-8, written once as an expression so an NCR can answer it in memory (IsOverdue) and the NCR list can
-    // filter on it in SQL (OverdueAt). With no due date yet, the lifted comparison "now > null" is false.
+    // The rules below are written once, as expressions, so an NCR can answer them in memory (IsFinished,
+    // IsOverdue) and a query can filter on them in SQL (Unfinished, OverdueAt). Declared in this order on purpose:
+    // static fields are set in the order they are written, and each rule is built from the one above it.
+    private static readonly Expression<Func<NonConformance, bool>> _unfinishedRule =
+        ncr => ncr.Status != NcrStatus.Closed && ncr.Status != NcrStatus.Cancelled;
+
+    private static readonly Func<NonConformance, bool> _isUnfinished = _unfinishedRule.Compile();
+
+    // BR-8. With no due date yet, the lifted comparison "now > null" is false, so it is not overdue.
     private static readonly Expression<Func<NonConformance, DateTimeOffset, bool>> _overdueRule =
-        (ncr, now) => ncr.Status != NcrStatus.Closed && ncr.Status != NcrStatus.Cancelled && now > ncr.DueDate;
+        UnfinishedAnd((ncr, now) => now > ncr.DueDate);
 
     private static readonly Func<NonConformance, DateTimeOffset, bool> _isOverdue = _overdueRule.Compile();
 
@@ -52,7 +59,11 @@ public sealed class NonConformance
 
     public IReadOnlyList<StatusChange> History => _history;
 
-    public bool IsFinished => Status is NcrStatus.Closed or NcrStatus.Cancelled;
+    /// <summary>Not closed or cancelled, as a filter a query provider such as EF Core can translate.</summary>
+    public static Expression<Func<NonConformance, bool>> Unfinished => _unfinishedRule;
+
+    // BR-6: a finished NCR cannot be changed in any way
+    public bool IsFinished => !_isUnfinished(this);
 
     public static NonConformance Raise(NcrNumber number, NcrDetails details, AuditStamp raised) =>
         new(number, details, raised) { Status = NcrStatus.Open };
@@ -194,6 +205,15 @@ public sealed class NonConformance
         {
             throw DomainException.NotPermitted("The investigator cannot verify their own fix.");
         }
+    }
+
+    private static Expression<Func<NonConformance, DateTimeOffset, bool>> UnfinishedAnd(
+        Expression<Func<NonConformance, DateTimeOffset, bool>> condition)
+    {
+        var ncr = condition.Parameters[0];
+        var unfinished = new ParameterReplacer(_unfinishedRule.Parameters[0], ncr).Visit(_unfinishedRule.Body);
+        return Expression.Lambda<Func<NonConformance, DateTimeOffset, bool>>(
+            Expression.AndAlso(unfinished, condition.Body), condition.Parameters);
     }
 
     private sealed class ParameterReplacer(ParameterExpression parameter, Expression replacement) : ExpressionVisitor

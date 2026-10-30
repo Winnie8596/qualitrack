@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router'
 import ProtectedRoute from '../auth/ProtectedRoute.tsx'
 import AppLayout from '../layout/AppLayout.tsx'
+import DashboardPage from '../pages/DashboardPage.tsx'
 import HomePage from '../pages/HomePage.tsx'
 import LoginPage from '../pages/LoginPage.tsx'
 import NcrDetailPage from '../pages/NcrDetailPage.tsx'
@@ -23,6 +24,10 @@ function AppRoutes() {
 
         <Route element={<ProtectedRoute allow={['Inspector']} />}>
           <Route path="ncrs/new" element={<RaiseNcrPage />} />
+        </Route>
+
+        <Route element={<ProtectedRoute allow={['QaManager']} />}>
+          <Route path="dashboard" element={<DashboardPage />} />
         </Route>
 
         <Route path="*" element={<NotFoundPage />} />
