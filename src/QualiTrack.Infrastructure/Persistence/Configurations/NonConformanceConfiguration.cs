@@ -31,6 +31,15 @@ internal sealed class NonConformanceConfiguration : IEntityTypeConfiguration<Non
         builder.Property(ncr => ncr.DueDate);
         builder.Property(ncr => ncr.RootCause);
 
+        // What the NCR list filters on: who may see a row (raised by, investigator), status, and overdue (due date).
+        // docs/learning/sql-indexes.md has the query plans before and after.
+        builder.HasIndex(ncr => ncr.Status);
+        builder.HasIndex(ncr => ncr.DueDate);
+        builder.HasIndex(ncr => ncr.InvestigatorId);
+
+        // The index on "Raised_By" is created in the AddNcrListIndexes migration: EF Core 10 cannot index a
+        // column of a complex property, so the model does not know about it (and so never drops it)
+
         // Actions and history are parts of the aggregate, always loaded and saved with it.
         // A JSON array keeps them in one row and in order, which the audit trail (BR-7) needs.
         // EF maps the private lists; the public read-only views stay read-only.
