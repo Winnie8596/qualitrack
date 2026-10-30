@@ -1,6 +1,6 @@
 import { Navigate, Outlet, useLocation } from 'react-router'
 import type { Role } from '../api/auth.ts'
-import { useAuth } from './authContext.ts'
+import { useAuth } from './useAuth.ts'
 
 type ProtectedRouteProps = {
   // Leave out to let any signed-in user in.

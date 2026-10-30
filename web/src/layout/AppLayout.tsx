@@ -1,5 +1,5 @@
 import { NavLink, Outlet } from 'react-router'
-import { useAuth } from '../auth/authContext.ts'
+import { useAuth } from '../auth/useAuth.ts'
 import { roleLabels } from '../auth/roleLabels.ts'
 
 function navLinkClass({ isActive }: { isActive: boolean }) {

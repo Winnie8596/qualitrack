@@ -1,14 +1,17 @@
+import { QueryClientProvider } from '@tanstack/react-query'
 import { BrowserRouter } from 'react-router'
-import AuthProvider from './auth/AuthProvider.tsx'
+import { createQueryClient } from './api/queryClient.ts'
 import AppRoutes from './routes/AppRoutes.tsx'
+
+const queryClient = createQueryClient()
 
 function App() {
   return (
-    <BrowserRouter>
-      <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
         <AppRoutes />
-      </AuthProvider>
-    </BrowserRouter>
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
 

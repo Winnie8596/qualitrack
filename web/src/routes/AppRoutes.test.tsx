@@ -1,7 +1,7 @@
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import AuthProvider from '../auth/AuthProvider.tsx'
 import AppRoutes from './AppRoutes.tsx'
 
 function json(body: unknown, status = 200) {
@@ -21,12 +21,14 @@ function signedInAs(role: string) {
 }
 
 function renderAt(path: string) {
+  // A fresh cache per test, with no retries, so a failure shows at once
+  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   render(
-    <MemoryRouter initialEntries={[path]}>
-      <AuthProvider>
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter initialEntries={[path]}>
         <AppRoutes />
-      </AuthProvider>
-    </MemoryRouter>,
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
 }
 
@@ -84,6 +86,14 @@ describe('AppRoutes', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('QualiTrack cannot be reached')
     expect(screen.queryByRole('heading', { name: 'Sign in' })).not.toBeInTheDocument()
+  })
+
+  it('treats a session answer it does not recognise as a failure, not a signed-in user', async () => {
+    signedInAs('Administrator')
+
+    renderAt('/')
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('QualiTrack cannot be reached')
   })
 
   it('shows a not-found page for an unknown address', async () => {
