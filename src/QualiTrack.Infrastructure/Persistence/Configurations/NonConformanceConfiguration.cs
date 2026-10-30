@@ -31,6 +31,9 @@ internal sealed class NonConformanceConfiguration : IEntityTypeConfiguration<Non
         builder.Property(ncr => ncr.DueDate);
         builder.Property(ncr => ncr.RootCause);
 
+        // Stored by name, read back as the one instance of that format. "!" is safe: EF never converts a null.
+        builder.Property(ncr => ncr.Photo).HasConversion(format => format!.Name, name => PhotoFormat.FromName(name));
+
         // What the NCR list filters on: who may see a row (raised by, investigator), status, and overdue (due date).
         // docs/learning/sql-indexes.md has the query plans before and after.
         builder.HasIndex(ncr => ncr.Status);

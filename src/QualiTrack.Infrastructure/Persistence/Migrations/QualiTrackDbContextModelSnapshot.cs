@@ -256,6 +256,9 @@ namespace QualiTrack.Infrastructure.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Photo")
+                        .HasColumnType("text");
+
                     b.Property<string>("RootCause")
                         .HasColumnType("text");
 

@@ -38,6 +38,26 @@ public sealed class NcrPersistenceTests(PostgresFixture database)
         Assert.Equal(ncr.History, loaded.History);
     }
 
+    [Fact]
+    public async Task A_saved_ncr_loads_back_with_the_format_of_its_photo()
+    {
+        var ncr = NonConformance.Raise(
+            database.NextNumber(),
+            new NcrDetails("Weld crack on beam B4", "Hairline crack along the fillet weld.", "Bay 3", Severity.Major),
+            new AuditStamp(_inspector, _raisedAt));
+        ncr.AttachPhoto(PhotoFormat.Jpeg, new AuditStamp(_inspector, _raisedAt));
+        await using (var writeContext = database.CreateContext())
+        {
+            writeContext.NonConformances.Add(ncr);
+            await writeContext.SaveChangesAsync();
+        }
+
+        await using var readContext = database.CreateContext();
+        var loaded = await readContext.NonConformances.SingleAsync(candidate => candidate.Id == ncr.Id);
+
+        Assert.Same(PhotoFormat.Jpeg, loaded.Photo);
+    }
+
     // Every part filled in: two actions (one completed late), and a rejection note in the history
     private static NonConformance RejectedOnceThenResubmitted(NcrNumber number)
     {
