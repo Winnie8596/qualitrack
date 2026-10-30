@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 using QualiTrack.Api.Authentication;
 using QualiTrack.Api.Http;
 using QualiTrack.Application.Abstractions;
@@ -72,6 +73,10 @@ public sealed record ListNcrsRequest(
 /// <summary>Raise an NCR and open one (A1, D2). Which role may do either is decided by the handler.</summary>
 public static class NcrEndpoints
 {
+    // The photo's 5 MB (checked by the domain) and room for the multipart headers; anything bigger is refused
+    // before it is read, so a huge upload costs no memory
+    private const long PhotoRequestSizeLimit = PhotoFormat.MaxLength + (64 * 1024);
+
     public static IServiceCollection AddNcrUseCases(this IServiceCollection services) =>
         services
             .AddScoped<NcrCommandRunner>()
@@ -85,7 +90,9 @@ public static class NcrEndpoints
             .AddScoped<CompleteCorrectiveActionHandler>()
             .AddScoped<SubmitForVerificationHandler>()
             .AddScoped<VerifyNcrHandler>()
-            .AddScoped<RejectVerificationHandler>();
+            .AddScoped<RejectVerificationHandler>()
+            .AddScoped<AttachPhotoHandler>()
+            .AddScoped<GetNcrPhotoHandler>();
 
     public static IEndpointRouteBuilder MapNcrEndpoints(this IEndpointRouteBuilder endpoints)
     {
@@ -101,6 +108,13 @@ public static class NcrEndpoints
         ncrs.MapPost("/{id:guid}/submit", SubmitAsync);
         ncrs.MapPost("/{id:guid}/verify", VerifyAsync);
         ncrs.MapPost("/{id:guid}/reject", RejectAsync);
+
+        // The framework adds its own antiforgery check to endpoints that read a form, which needs middleware this
+        // app does not use; the group's filter above checks the token on this endpoint as on every other write
+        ncrs.MapPost("/{id:guid}/photo", AttachPhotoAsync)
+            .DisableAntiforgery()
+            .WithMetadata(new RequestSizeLimitAttribute(PhotoRequestSizeLimit));
+        ncrs.MapGet("/{id:guid}/photo", GetPhotoAsync);
         return endpoints;
     }
 
@@ -157,4 +171,21 @@ public static class NcrEndpoints
     private static async Task<IResult> RejectAsync(
         Guid id, ReasonRequest request, RejectVerificationHandler handler, CancellationToken cancellationToken) =>
         (await handler.HandleAsync(new RejectVerificationCommand(id, request.Reason!), cancellationToken)).ToHttpResult();
+
+    private static async Task<IResult> AttachPhotoAsync(
+        Guid id, IFormFile? photo, AttachPhotoHandler handler, CancellationToken cancellationToken)
+    {
+        if (photo is null)
+        {
+            return TypedResults.ValidationProblem(new Dictionary<string, string[]> { ["photo"] = ["Choose a photo."] });
+        }
+
+        await using var content = photo.OpenReadStream();
+        return (await handler.HandleAsync(new AttachPhotoCommand(id, content), cancellationToken)).ToHttpResult();
+    }
+
+    // The stream is disposed by the result once it has been sent
+    private static async Task<IResult> GetPhotoAsync(Guid id, GetNcrPhotoHandler handler, CancellationToken cancellationToken) =>
+        (await handler.HandleAsync(new GetNcrPhotoQuery(id), cancellationToken))
+            .ToHttpResult(photo => TypedResults.Stream(photo.Content, photo.ContentType));
 }

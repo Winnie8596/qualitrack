@@ -15,6 +15,7 @@ public sealed class QualiTrackApiFactory : WebApplicationFactory<Program>, IAsyn
     public const string DemoPassword = "Demo-Password-1";
 
     private readonly PostgreSqlContainer _database = new PostgreSqlBuilder("postgres:17-alpine").Build();
+    private readonly string _photos = Path.Combine(Path.GetTempPath(), $"qualitrack-photos-{Guid.NewGuid():N}");
 
     public QualiTrackDbContext CreateDbContext() =>
         new(new DbContextOptionsBuilder<QualiTrackDbContext>().UseNpgsql(_database.GetConnectionString()).Options);
@@ -25,6 +26,10 @@ public sealed class QualiTrackApiFactory : WebApplicationFactory<Program>, IAsyn
     {
         await base.DisposeAsync();
         await _database.DisposeAsync();
+        if (Directory.Exists(_photos))
+        {
+            Directory.Delete(_photos, recursive: true);
+        }
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder) =>
@@ -34,6 +39,7 @@ public sealed class QualiTrackApiFactory : WebApplicationFactory<Program>, IAsyn
             .UseSetting("DemoUsers:Inspector", DemoPassword)
             .UseSetting("DemoUsers:Investigator", DemoPassword)
             .UseSetting("DemoUsers:QaManager", DemoPassword)
+            .UseSetting("FileStore:Root", _photos)
             // Every test client shares one address, so the real limit would soon refuse other tests' logins;
             // AuthEndpointsTests checks the limit on a host of its own
             .UseSetting("LoginRateLimit:PermitLimit", "1000");

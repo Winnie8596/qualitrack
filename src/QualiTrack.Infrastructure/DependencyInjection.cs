@@ -4,6 +4,7 @@ using QualiTrack.Application.Abstractions;
 using QualiTrack.Infrastructure.Caching;
 using QualiTrack.Infrastructure.Identity;
 using QualiTrack.Infrastructure.Persistence;
+using QualiTrack.Infrastructure.Storage;
 using StackExchange.Redis;
 
 namespace QualiTrack.Infrastructure;
@@ -18,6 +19,10 @@ public static class DependencyInjection
             .AddScoped<INcrNumberGenerator, NcrNumberGenerator>()
             .AddScoped<IUserDirectory, IdentityUserDirectory>()
             .AddSingleton<IClock, SystemClock>();
+
+    /// <summary>NCR photos in <paramref name="root"/> on local disk: a mounted volume in Docker.</summary>
+    public static IServiceCollection AddFileStore(this IServiceCollection services, string root) =>
+        services.AddSingleton<IFileStore>(new LocalFileStore(root));
 
     /// <summary>
     /// The dashboard reader, cache-aside over Redis. Without a Redis connection string (tests, a quick local run)
