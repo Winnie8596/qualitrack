@@ -9,7 +9,7 @@
 
 ### Working agreement
 
-1. **One task at a time.** Pick the next unchecked task in the current phase, do it, verify it, tick it (`- [x]`), then stop and summarise.
+1. **One phase at a time.** Work through the current phase's tasks in order: do each one, verify it, tick it (`- [x]`), commit, and go straight on to the next. Stop and summarise when the phase's "Done when" holds (or when rule 5 applies). Slices still get one branch and PR each, stacked on each other (agreed with owner).
 2. **Tests first.** For any behaviour: write the failing test, show it fails, implement the minimum to pass, refactor. Never write production code for a rule without a test.
 3. **Small diffs.** One task = one commit using Conventional Commits (`feat(domain): ...`, `test(api): ...`, `refactor: ...`, `ci: ...`, `docs: ...`).
 4. **Explain.** After each task, write 3–5 lines: what changed, why, which principle it applies, anything the owner should learn or check. The owner must be able to defend this code in an interview.
