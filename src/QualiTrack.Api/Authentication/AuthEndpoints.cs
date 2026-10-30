@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using QualiTrack.Api.Http;
 using QualiTrack.Application.Abstractions;
 using QualiTrack.Infrastructure.Identity;
 
@@ -19,6 +20,7 @@ public static class AuthEndpoints
         auth.MapPost("/login", LoginAsync).RequireRateLimiting(LoginRateLimit.Policy);
         auth.MapPost("/logout", LogoutAsync);
         auth.MapGet("/me", Me).RequireAuthorization(Policies.SignedIn);
+        auth.MapGet("/antiforgery", AntiforgeryProtection.IssueToken).RequireAuthorization(Policies.SignedIn);
         return endpoints;
     }
 

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using QualiTrack.Api.Http;
 
 namespace QualiTrack.Api.IntegrationTests.Ncrs;
 
@@ -171,6 +172,11 @@ public sealed class NcrEndpointsTests(QualiTrackApiFactory api)
         var password = email.EndsWith("@qualitrack.demo", StringComparison.Ordinal) ? QualiTrackApiFactory.DemoPassword : Password;
         var login = await client.PostAsJsonAsync("/api/auth/login", new { email, password });
         login.EnsureSuccessStatusCode();
+
+        // As the web app does: the token belongs to the session, so it is fetched after logging in
+        var antiforgery = await client.GetFromJsonAsync<AntiforgeryToken>("/api/auth/antiforgery");
+        client.DefaultRequestHeaders.Add(AntiforgeryProtection.HeaderName, antiforgery!.Token);
+
         return (client, (await login.Content.ReadFromJsonAsync<SignedInUser>())!.Id);
     }
 
@@ -202,6 +208,8 @@ public sealed class NcrEndpointsTests(QualiTrackApiFactory api)
     }
 
     private sealed record SignedInUser(Guid Id);
+
+    private sealed record AntiforgeryToken(string Token);
 
     private sealed record RaisedNcr(Guid Id);
 

@@ -26,6 +26,7 @@ builder.Services.AddHealthChecks();
 builder.Services.AddPersistence(connectionString);
 builder.Services.AddCookieAuthentication();
 builder.Services.AddLoginRateLimit(builder.Configuration);
+builder.Services.AddAntiforgeryProtection();
 builder.Services.AddNcrUseCases();
 
 var app = builder.Build();

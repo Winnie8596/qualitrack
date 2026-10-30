@@ -31,7 +31,7 @@ public static class NcrEndpoints
 
     public static IEndpointRouteBuilder MapNcrEndpoints(this IEndpointRouteBuilder endpoints)
     {
-        var ncrs = endpoints.MapGroup("/api/ncrs").RequireAuthorization(Policies.SignedIn);
+        var ncrs = endpoints.MapGroup("/api/ncrs").RequireAuthorization(Policies.SignedIn).RequireAntiforgeryToken();
         ncrs.MapPost("/", RaiseAsync);
         ncrs.MapGet("/{id:guid}", GetByIdAsync);
         return endpoints;

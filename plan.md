@@ -213,7 +213,7 @@ Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is 
 - [x] `Result` → ProblemDetails mapping in one place; endpoints grouped with `MapGroup`, each with `.RequireAuthorization(policy)`
 - [x] `GetNcrById` query (response DTO, never the entity)
 - [x] `POST /api/ncrs`, `GET /api/ncrs/{id}`; request DTOs validated; integration tests: 201, 400, 401, 403, 404
-- [ ] Antiforgery (CSRF) for cookie-authenticated writes; test that a write without the token is rejected
+- [x] Antiforgery (CSRF) for cookie-authenticated writes; test that a write without the token is rejected
 - [ ] Security headers (CSP, `X-Content-Type-Options`, `Referrer-Policy`) on every response
 
 ### Web
