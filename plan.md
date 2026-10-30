@@ -235,7 +235,7 @@ Goal: each slice leaves one more user story working end to end. Do them in order
 - [x] **S2 — NCR list** (D1): `ListNcrs` (filters, sort, paging, role visibility); indexes on `Status`, `DueDate`, `InvestigatorId`, `RaisedBy`; `EXPLAIN ANALYZE` with 10,000 seeded rows before and after indexes in `docs/learning/sql-indexes.md`; test that the list issues a single SQL query (no N+1); list page with filters, sort, paging, overdue badge; correlation ID middleware + structured request logging
 - [x] **S3 — Triage** (A2, A3): `/assign`, `/cancel`; assign and cancel controls on the detail page for QA managers (also `GET /api/users/investigators` for the assign form's picker)
 - [x] **S4 — Investigator work** (B1–B3): `/plan-fix`, `/actions`, `/actions/{actionId}/complete`, `/submit`; plan-fix form, action list, history timeline
-- [ ] **S5 — Verification** (C1, C2): `/verify`, `/reject`; HTTP integration test for the full lifecycle Open → Closed; Playwright smoke test: log in as each role and run the lifecycle
+- [x] **S5 — Verification** (C1, C2): `/verify`, `/reject`; HTTP integration test for the full lifecycle Open → Closed; Playwright smoke test: log in as each role and run the lifecycle
 - [ ] **S6 — Dashboard** (D3): `GetDashboard` tested with seeded data; `/api/dashboard`; Redis in `docker-compose.yml` with `IDistributedCache` (cache-aside, 60 s TTL, invalidated when an NCR changes status, falls back to the database if Redis is down); dashboard page
 - [ ] **S7 — Photo** (A1, D2): `LocalFileStore`; JPEG/PNG only, max 5 MB; upload on the raise form, shown on the detail page
 
