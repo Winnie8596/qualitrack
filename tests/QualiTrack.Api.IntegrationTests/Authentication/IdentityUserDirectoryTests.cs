@@ -35,6 +35,20 @@ public sealed class IdentityUserDirectoryTests(QualiTrackApiFactory api)
         Assert.Null(role);
     }
 
+    [Fact]
+    public async Task The_directory_lists_the_users_with_a_role_by_id_and_email()
+    {
+        var investigator = await DemoUserIdAsync("investigator@qualitrack.demo");
+        var inspector = await DemoUserIdAsync("inspector@qualitrack.demo");
+        await using var scope = api.Services.CreateAsyncScope();
+
+        var investigators = await scope.ServiceProvider.GetRequiredService<IUserDirectory>()
+            .ListAsync(Role.Investigator, CancellationToken.None);
+
+        Assert.Contains(new DirectoryUser(investigator, "investigator@qualitrack.demo"), investigators);
+        Assert.DoesNotContain(investigators, user => user.Id == inspector);
+    }
+
     private async Task<UserId> DemoUserIdAsync(string email)
     {
         _ = api.Server;
