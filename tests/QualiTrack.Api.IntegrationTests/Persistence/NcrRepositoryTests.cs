@@ -1,5 +1,10 @@
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using QualiTrack.Domain;
 using QualiTrack.Domain.NonConformances;
+using QualiTrack.Infrastructure.Caching;
 using QualiTrack.Infrastructure.Persistence;
 
 namespace QualiTrack.Api.IntegrationTests.Persistence;
@@ -17,7 +22,7 @@ public sealed class NcrRepositoryTests(PostgresFixture database)
         await using (var context = database.CreateContext())
         {
             new NcrRepository(context).Add(ncr);
-            await new UnitOfWork(context).SaveChangesAsync(CancellationToken.None);
+            await UnitOfWork(context).SaveChangesAsync(CancellationToken.None);
         }
 
         await using var readContext = database.CreateContext();
@@ -51,7 +56,7 @@ public sealed class NcrRepositoryTests(PostgresFixture database)
             Assert.NotNull(loaded);
             loaded.CompleteAction(loaded.Actions[0].Id, Day(3));
             loaded.SubmitForVerification(Day(3));
-            await new UnitOfWork(context).SaveChangesAsync(CancellationToken.None);
+            await UnitOfWork(context).SaveChangesAsync(CancellationToken.None);
         }
 
         await using var readContext = database.CreateContext();
@@ -74,6 +79,10 @@ public sealed class NcrRepositoryTests(PostgresFixture database)
         context.NonConformances.Add(ncr);
         await context.SaveChangesAsync();
     }
+
+    private static UnitOfWork UnitOfWork(QualiTrackDbContext context) =>
+        new(context, new DashboardCache(
+            new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions())), NullLogger<DashboardCache>.Instance));
 
     private static AuditStamp Day(int daysAfterRaised) => new(_investigator, _raisedAt.AddDays(daysAfterRaised));
 }

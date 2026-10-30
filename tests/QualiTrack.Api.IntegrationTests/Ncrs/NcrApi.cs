@@ -11,7 +11,7 @@ namespace QualiTrack.Api.IntegrationTests.Ncrs;
 /// Signs in as the demo users (or new ones) and drives NCRs through the API the way the web app does, so an
 /// endpoint test can set up the state it needs in a line and then check the one call it is about.
 /// </summary>
-internal sealed class NcrApi(QualiTrackApiFactory api)
+internal sealed class NcrApi(WebApplicationFactory<Program> api)
 {
     public const string Inspector = "inspector@qualitrack.demo";
     public const string Investigator = "investigator@qualitrack.demo";
