@@ -1,12 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useId } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { toFormErrors } from '../api/formErrors.ts'
-import { allNcrsQueryKey, cancelNcr } from '../api/ncrs.ts'
+import { cancelNcr } from '../api/ncrs.ts'
 import FormAlert from '../forms/FormAlert.tsx'
 import TextAreaField from '../forms/TextAreaField.tsx'
+import { useNcrCommand } from './useNcrCommand.ts'
 
 // BR-7: cancelling needs a reason, which goes into the history
 const cancelSchema = z.object({ reason: z.string().trim().min(1, 'Enter a reason.') })
@@ -24,7 +24,6 @@ type CancelFormProps = {
 /** A3, for a QA manager on an NCR that is not finished. */
 function CancelForm({ ncrId }: CancelFormProps) {
   const headingId = useId()
-  const queryClient = useQueryClient()
   const {
     register,
     handleSubmit,
@@ -34,9 +33,7 @@ function CancelForm({ ncrId }: CancelFormProps) {
     resolver: zodResolver(cancelSchema),
     defaultValues: { reason: '' },
   })
-  const cancel = useMutation({
-    mutationFn: ({ reason }: z.output<typeof cancelSchema>) => cancelNcr(ncrId, reason),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: allNcrsQueryKey }),
+  const cancel = useNcrCommand(({ reason }: z.output<typeof cancelSchema>) => cancelNcr(ncrId, reason), {
     onError: (error) => {
       const message = toFormErrors(error, cancelFields).fields.reason
       if (message) {

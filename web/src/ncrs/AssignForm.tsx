@@ -1,15 +1,16 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { toFormErrors } from '../api/formErrors.ts'
-import { allNcrsQueryKey, assignInvestigator } from '../api/ncrs.ts'
+import { assignInvestigator } from '../api/ncrs.ts'
 import { investigatorsQueryOptions } from '../api/users.ts'
 import { primaryButtonClass } from '../forms/fieldClass.ts'
 import FormAlert from '../forms/FormAlert.tsx'
 import SelectField from '../forms/SelectField.tsx'
 import TextField from '../forms/TextField.tsx'
+import { useNcrCommand } from './useNcrCommand.ts'
 
 // Only that both are there; BR-2 (future, and within 7 days for a critical NCR) is the domain's to check
 const assignSchema = z.object({
@@ -30,7 +31,6 @@ type AssignFormProps = {
 /** A2, for a QA manager on an open NCR. */
 function AssignForm({ ncrId }: AssignFormProps) {
   const headingId = useId()
-  const queryClient = useQueryClient()
   const investigators = useQuery(investigatorsQueryOptions)
   const {
     register,
@@ -41,9 +41,7 @@ function AssignForm({ ncrId }: AssignFormProps) {
     resolver: zodResolver(assignSchema),
     defaultValues: { investigatorId: '', dueDate: '' },
   })
-  const assign = useMutation({
-    mutationFn: (request: z.output<typeof assignSchema>) => assignInvestigator(ncrId, request),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: allNcrsQueryKey }),
+  const assign = useNcrCommand((request: z.output<typeof assignSchema>) => assignInvestigator(ncrId, request), {
     onError: (error) => {
       const { fields } = toFormErrors(error, assignFields)
       for (const field of assignFields) {
