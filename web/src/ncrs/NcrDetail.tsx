@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import type { CurrentUser } from '../api/auth.ts'
 import { ApiError } from '../api/client.ts'
 import { ncrQueryOptions } from '../api/ncrs.ts'
 import FormAlert from '../forms/FormAlert.tsx'
@@ -9,10 +10,11 @@ import NcrNotFound from './NcrNotFound.tsx'
 import OverdueBadge from './OverdueBadge.tsx'
 import SeverityBadge from './SeverityBadge.tsx'
 import StatusBadge from './StatusBadge.tsx'
+import TriageControls from './TriageControls.tsx'
 
 type NcrDetailProps = {
   id: string
-  currentUserId: string
+  currentUser: CurrentUser
 }
 
 // The API returns users as ids only. Until it returns names, the reader is "You" and anyone else a short id.
@@ -23,7 +25,7 @@ function describeUser(userId: string, currentUserId: string): string {
 const sectionHeadingClass = 'text-lg font-semibold'
 
 /** Everything known about one NCR (D2, without the photo until S7). */
-function NcrDetail({ id, currentUserId }: NcrDetailProps) {
+function NcrDetail({ id, currentUser }: NcrDetailProps) {
   const { data: ncr, error, isPending } = useQuery(ncrQueryOptions(id))
 
   if (isPending) {
@@ -57,12 +59,12 @@ function NcrDetail({ id, currentUserId }: NcrDetailProps) {
             <span className="whitespace-pre-line">{ncr.description}</span>
           </DetailRow>
           <DetailRow term="Location">{ncr.location}</DetailRow>
-          <DetailRow term="Raised by">{describeUser(ncr.raisedBy, currentUserId)}</DetailRow>
+          <DetailRow term="Raised by">{describeUser(ncr.raisedBy, currentUser.id)}</DetailRow>
           <DetailRow term="Raised">
             <DateTime iso={ncr.raisedAt} />
           </DetailRow>
           <DetailRow term="Investigator">
-            {ncr.investigatorId ? describeUser(ncr.investigatorId, currentUserId) : 'Not assigned yet'}
+            {ncr.investigatorId ? describeUser(ncr.investigatorId, currentUser.id) : 'Not assigned yet'}
           </DetailRow>
           <DetailRow term="Due">
             {ncr.dueDate ? <DateTime iso={ncr.dueDate} /> : 'Not set'}
@@ -77,6 +79,8 @@ function NcrDetail({ id, currentUserId }: NcrDetailProps) {
           </DetailRow>
         </dl>
       </section>
+
+      {currentUser.role === 'QaManager' && <TriageControls ncr={ncr} />}
 
       <section aria-labelledby="ncr-actions">
         <h2 id="ncr-actions" className={sectionHeadingClass}>
@@ -118,7 +122,7 @@ function NcrDetail({ id, currentUserId }: NcrDetailProps) {
                   {statusLabels[change.from]} → {statusLabels[change.to]}
                 </span>{' '}
                 <span className="text-sm text-slate-600">
-                  by {describeUser(change.by, currentUserId)}, <DateTime iso={change.at} />
+                  by {describeUser(change.by, currentUser.id)}, <DateTime iso={change.at} />
                 </span>
                 {change.note && <p className="text-slate-700">{change.note}</p>}
               </li>

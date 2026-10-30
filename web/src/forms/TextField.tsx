@@ -6,7 +6,7 @@ type TextFieldProps = {
   label: string
   registration: UseFormRegisterReturn
   error?: string
-  type?: 'text' | 'email' | 'password'
+  type?: 'text' | 'email' | 'password' | 'datetime-local'
   autoComplete?: InputHTMLAttributes<HTMLInputElement>['autoComplete']
 }
 

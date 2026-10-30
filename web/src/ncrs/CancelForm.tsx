@@ -1,0 +1,69 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useId } from 'react'
+import { useForm } from 'react-hook-form'
+import { z } from 'zod'
+import { toFormErrors } from '../api/formErrors.ts'
+import { allNcrsQueryKey, cancelNcr } from '../api/ncrs.ts'
+import FormAlert from '../forms/FormAlert.tsx'
+import TextAreaField from '../forms/TextAreaField.tsx'
+
+// BR-7: cancelling needs a reason, which goes into the history
+const cancelSchema = z.object({ reason: z.string().trim().min(1, 'Enter a reason.') })
+
+const cancelFields = ['reason'] as const
+
+// Red, because cancelling cannot be undone (BR-6)
+const dangerButtonClass =
+  'rounded bg-red-700 px-4 py-2 font-medium text-white hover:bg-red-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:opacity-60'
+
+type CancelFormProps = {
+  ncrId: string
+}
+
+/** A3, for a QA manager on an NCR that is not finished. */
+function CancelForm({ ncrId }: CancelFormProps) {
+  const headingId = useId()
+  const queryClient = useQueryClient()
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors },
+  } = useForm<z.input<typeof cancelSchema>, unknown, z.output<typeof cancelSchema>>({
+    resolver: zodResolver(cancelSchema),
+    defaultValues: { reason: '' },
+  })
+  const cancel = useMutation({
+    mutationFn: ({ reason }: z.output<typeof cancelSchema>) => cancelNcr(ncrId, reason),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: allNcrsQueryKey }),
+    onError: (error) => {
+      const message = toFormErrors(error, cancelFields).fields.reason
+      if (message) {
+        setError('reason', { type: 'server', message })
+      }
+    },
+  })
+
+  const formError = cancel.error ? toFormErrors(cancel.error, cancelFields).form : undefined
+
+  return (
+    <form
+      aria-labelledby={headingId}
+      noValidate
+      onSubmit={handleSubmit((request) => cancel.mutate(request))}
+      className="space-y-4"
+    >
+      <h3 id={headingId} className="font-semibold">
+        Cancel this NCR
+      </h3>
+      {formError && <FormAlert message={formError} />}
+      <TextAreaField label="Reason" registration={register('reason')} error={errors.reason?.message} />
+      <button type="submit" disabled={cancel.isPending} className={dangerButtonClass}>
+        {cancel.isPending ? 'Cancelling…' : 'Cancel NCR'}
+      </button>
+    </form>
+  )
+}
+
+export default CancelForm
