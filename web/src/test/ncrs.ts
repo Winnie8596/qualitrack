@@ -1,4 +1,4 @@
-import type { Ncr } from '../api/ncrs.ts'
+import type { Ncr, NcrListPage, NcrSummary } from '../api/ncrs.ts'
 import { userIds } from './fakeApi.ts'
 
 /** An NCR as GET /api/ncrs/{id} returns it: open, just raised by the inspector. Override what a test cares about. */
@@ -21,4 +21,14 @@ export function anNcr(overrides: Partial<Ncr> = {}): Ncr {
     history: [],
     ...overrides,
   }
+}
+
+/** A row of GET /api/ncrs, matching {@link anNcr}. */
+export function anNcrSummary(overrides: Partial<NcrSummary> = {}): NcrSummary {
+  const { id, number, title, severity, status, raisedAt, dueDate, isOverdue } = anNcr()
+  return { id, number, title, severity, status, raisedAt, dueDate, isOverdue, ...overrides }
+}
+
+export function aListPage(items: NcrSummary[], overrides: Partial<NcrListPage> = {}): NcrListPage {
+  return { items, page: 1, hasNextPage: false, ...overrides }
 }
