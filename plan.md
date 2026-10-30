@@ -218,7 +218,7 @@ Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is 
 
 ### Web
 
-- [ ] Tailwind CSS (ADR 0007 records the choice); app layout with semantic landmarks
+- [x] Tailwind CSS (ADR 0007 records the choice); app layout with semantic landmarks
 - [ ] Routing, auth context from `/api/auth/me`, protected routes per role
 - [ ] Typed API client (`web/src/api/`) using `fetch` + TanStack Query; ProblemDetails surfaced as form/field errors
 - [ ] Login page; Raise NCR form (React Hook Form + Zod); NCR detail page with status badge
