@@ -8,14 +8,16 @@ internal static class Ncrs
 {
     public static readonly DateTimeOffset RaisedAt = new(2026, 10, 28, 9, 0, 0, TimeSpan.Zero);
 
-    private static readonly UserId _inspector = new(Guid.NewGuid());
+    /// <summary>The inspector who raised every NCR built here.</summary>
+    public static readonly UserId Inspector = new(Guid.NewGuid());
+
     private static readonly UserId _manager = new(Guid.NewGuid());
 
     public static NonConformance Open(Severity severity = Severity.Major) =>
         NonConformance.Raise(
             NcrNumber.From(2026, 1),
             new NcrDetails("Weld crack on beam B4", "Hairline crack along the fillet weld.", "Bay 3", severity),
-            new AuditStamp(_inspector, RaisedAt));
+            new AuditStamp(Inspector, RaisedAt));
 
     public static NonConformance Investigating(UserId investigator)
     {

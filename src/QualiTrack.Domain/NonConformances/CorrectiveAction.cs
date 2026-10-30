@@ -12,6 +12,14 @@ public sealed class CorrectiveAction
         Added = added;
     }
 
+    // For EF Core only: it cannot pass a complex value (Added) to a constructor. "!" is safe because EF sets
+    // every property from storage before anything reads them.
+    private CorrectiveAction()
+    {
+        Description = null!;
+        Added = null!;
+    }
+
     public Guid Id { get; } = Guid.NewGuid();
 
     public string Description { get; }

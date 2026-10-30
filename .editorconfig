@@ -99,3 +99,8 @@ dotnet_naming_rule.async_methods_end_with_async.severity = warning
 dotnet_naming_rule.types_and_members_pascal.severity = none
 dotnet_naming_rule.async_methods_end_with_async.severity = none
 dotnet_diagnostic.CA1707.severity = none # identifiers contain underscores
+
+# EF Core writes these with `dotnet ef migrations add` and rewrites them on the next migration, so they are
+# treated as generated code: analyzers and the formatter skip them instead of failing the build on its style.
+[src/QualiTrack.Infrastructure/Persistence/Migrations/**.cs]
+generated_code = true

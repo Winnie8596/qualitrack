@@ -1,31 +1,17 @@
-import { useEffect, useState } from 'react'
+import { QueryClientProvider } from '@tanstack/react-query'
+import { BrowserRouter } from 'react-router'
+import { createQueryClient } from './api/queryClient.ts'
+import AppRoutes from './routes/AppRoutes.tsx'
 
-type ApiStatus = 'checking' | 'healthy' | 'unreachable'
+const queryClient = createQueryClient()
 
 function App() {
-  const [status, setStatus] = useState<ApiStatus>('checking')
-
-  useEffect(() => {
-    const controller = new AbortController()
-
-    fetch('/health', { signal: controller.signal })
-      .then((response) => setStatus(response.ok ? 'healthy' : 'unreachable'))
-      .catch((error: unknown) => {
-        // Unmounting aborts the request; that is not an API failure.
-        if (!controller.signal.aborted) {
-          console.error('Health check failed', error)
-          setStatus('unreachable')
-        }
-      })
-
-    return () => controller.abort()
-  }, [])
-
   return (
-    <main>
-      <h1>QualiTrack</h1>
-      <p role="status">API status: {status}</p>
-    </main>
+    <QueryClientProvider client={queryClient}>
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
+    </QueryClientProvider>
   )
 }
 

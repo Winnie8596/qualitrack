@@ -14,6 +14,15 @@ public sealed class NonConformance
         Raised = raised;
     }
 
+    // For EF Core only: it cannot pass complex values (Details, Raised) to a constructor, so it builds an empty
+    // instance and sets every property from the row. "!" is safe because nothing reads them before that.
+    private NonConformance()
+    {
+        Number = null!;
+        Details = null!;
+        Raised = null!;
+    }
+
     public Guid Id { get; } = Guid.NewGuid();
 
     public NcrNumber Number { get; }

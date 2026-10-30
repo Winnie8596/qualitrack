@@ -1,15 +1,14 @@
 using System.Net;
-using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace QualiTrack.Api.IntegrationTests;
 
-public sealed class HealthEndpointTests(WebApplicationFactory<Program> factory)
-    : IClassFixture<WebApplicationFactory<Program>>
+[Collection(ApiCollection.Name)]
+public sealed class HealthEndpointTests(QualiTrackApiFactory api)
 {
     [Fact]
     public async Task Health_returns_200_when_the_app_starts()
     {
-        var client = factory.CreateClient();
+        var client = api.CreateClient();
 
         var response = await client.GetAsync("/health");
 
