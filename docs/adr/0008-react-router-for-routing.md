@@ -26,11 +26,13 @@ The options the owner weighed:
 
 Use **React Router** (the `react-router` package, v8) in declarative mode.
 
-- **One route table** in `web/src/routes/AppRoutes.tsx`, wrapped in `<BrowserRouter>` and the
-  `AuthProvider` in `App.tsx`. `AppLayout` is a layout route, so every page shares the landmarks
-  and the nav.
-- **Who is signed in** comes from `/api/auth/me`, asked once on load by `AuthProvider`, because the
-  session cookie is `HttpOnly` and the app cannot read it (ADR 0006). The answer is one of
+- **One route table** in `web/src/routes/AppRoutes.tsx`, wrapped in `<BrowserRouter>` (and the
+  TanStack Query provider) in `App.tsx`. `AppLayout` is a layout route, so every page shares the
+  landmarks and the nav.
+- **Who is signed in** comes from `/api/auth/me`, through the `useAuth` hook: a TanStack Query
+  query whose answer every component shares, re-asked after five minutes so an expired session is
+  noticed. The app has to ask because the session cookie is `HttpOnly` and it cannot read it
+  (ADR 0006). The answer is one of
   `checking`, `signedOut`, `signedIn` (with the user and role) or `unavailable`. A server error is
   `unavailable`, never `signedOut`, so a broken API does not look like a logged-out user.
 - **Protected routes** are layout routes using `ProtectedRoute`, with an optional `allow` list of
