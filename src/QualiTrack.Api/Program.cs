@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.HttpLogging;
 using QualiTrack.Api.Authentication;
 using QualiTrack.Api.Http;
 using QualiTrack.Api.Ncrs;
+using QualiTrack.Api.Users;
 using QualiTrack.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -38,6 +39,7 @@ builder.Services.AddCookieAuthentication();
 builder.Services.AddLoginRateLimit(builder.Configuration);
 builder.Services.AddAntiforgeryProtection();
 builder.Services.AddNcrUseCases();
+builder.Services.AddUserUseCases();
 
 var app = builder.Build();
 
@@ -68,5 +70,6 @@ app.UseRateLimiter();
 app.MapHealthChecks("/health");
 app.MapAuthEndpoints();
 app.MapNcrEndpoints();
+app.MapUserEndpoints();
 
 await app.RunAsync();

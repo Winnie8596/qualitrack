@@ -18,7 +18,7 @@ function NcrDetailPage() {
   if (auth.status !== 'signedIn') {
     return null
   }
-  return <NcrDetail id={id.data} currentUserId={auth.user.id} />
+  return <NcrDetail id={id.data} currentUser={auth.user} />
 }
 
 export default NcrDetailPage

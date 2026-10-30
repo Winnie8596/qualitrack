@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
-import { getJson, postJson } from './client.ts'
+import { getJson, postCommand, postJson } from './client.ts'
 
 // The API sends enums by name (JsonStringEnumConverter), so these match the C# enums one for one.
 export const severitySchema = z.enum(['Minor', 'Major', 'Critical'])
@@ -110,3 +110,21 @@ export async function raiseNcr(request: RaiseNcrRequest): Promise<string> {
   const { id } = await postJson('/api/ncrs', request, raisedNcrSchema)
   return id
 }
+
+export type AssignInvestigatorRequest = {
+  investigatorId: string
+  dueDate: string
+}
+
+/** A2: the NCR becomes Investigating. */
+export function assignInvestigator(id: string, request: AssignInvestigatorRequest): Promise<void> {
+  return postCommand(`/api/ncrs/${encodeURIComponent(id)}/assign`, request)
+}
+
+/** A3: the NCR becomes Cancelled, with the reason in its history. */
+export function cancelNcr(id: string, reason: string): Promise<void> {
+  return postCommand(`/api/ncrs/${encodeURIComponent(id)}/cancel`, { reason })
+}
+
+/** Every cached NCR and list page, which a command on any NCR may have changed. */
+export const allNcrsQueryKey = ['ncrs'] as const

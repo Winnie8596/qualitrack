@@ -92,6 +92,11 @@ export async function postJson<T>(path: string, body: unknown, schema: z.ZodType
   return parse(await post(path, body, { 'X-XSRF-TOKEN': await currentAntiforgeryToken() }), schema)
 }
 
+/** A command as the signed-in user: the API answers 204 with no body, so there is nothing to parse. */
+export async function postCommand(path: string, body: unknown): Promise<void> {
+  await post(path, body, { 'X-XSRF-TOKEN': await currentAntiforgeryToken() })
+}
+
 // Signing in and out only: the API asks no token of them, and before sign-in there is no user to fetch one for.
 
 export async function postJsonWithoutAntiforgery<T>(path: string, body: unknown, schema: z.ZodType<T>): Promise<T> {

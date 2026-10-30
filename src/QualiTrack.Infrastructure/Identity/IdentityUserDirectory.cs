@@ -19,4 +19,19 @@ internal sealed class IdentityUserDirectory(QualiTrackDbContext context) : IUser
 
         return IdentityRoles.From(roleNames);
     }
+
+    // A user with more than one role has no role the app can act on (IdentityRoles.From), so is never listed
+    public async Task<IReadOnlyList<DirectoryUser>> ListAsync(Role role, CancellationToken cancellationToken)
+    {
+        var roleName = role.ToString();
+        var users = await context.Users
+            .Where(user => user.Email != null
+                && context.UserRoles.Count(userRole => userRole.UserId == user.Id) == 1
+                && context.UserRoles.Any(userRole => userRole.UserId == user.Id
+                    && context.Roles.Any(candidate => candidate.Id == userRole.RoleId && candidate.Name == roleName)))
+            .Select(user => new { user.Id, Email = user.Email ?? string.Empty })
+            .ToListAsync(cancellationToken);
+
+        return [.. users.Select(user => new DirectoryUser(new UserId(user.Id), user.Email))];
+    }
 }
