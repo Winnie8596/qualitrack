@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { toFormErrors } from '../api/formErrors.ts'
 import { cancelNcr } from '../api/ncrs.ts'
+import { dangerButtonClass } from '../forms/fieldClass.ts'
 import FormAlert from '../forms/FormAlert.tsx'
 import TextAreaField from '../forms/TextAreaField.tsx'
 import { useNcrCommand } from './useNcrCommand.ts'
@@ -12,10 +13,6 @@ import { useNcrCommand } from './useNcrCommand.ts'
 const cancelSchema = z.object({ reason: z.string().trim().min(1, 'Enter a reason.') })
 
 const cancelFields = ['reason'] as const
-
-// Red, because cancelling cannot be undone (BR-6)
-const dangerButtonClass =
-  'rounded bg-red-700 px-4 py-2 font-medium text-white hover:bg-red-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-700 disabled:opacity-60'
 
 type CancelFormProps = {
   ncrId: string

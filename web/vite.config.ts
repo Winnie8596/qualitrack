@@ -17,5 +17,7 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
+    // See src/test/setup.ts: a page test that types into several fields can take a few seconds under load
+    testTimeout: 15_000,
   },
 })
