@@ -153,3 +153,13 @@ export function completeCorrectiveAction(id: string, actionId: string): Promise<
 export function submitForVerification(id: string): Promise<void> {
   return postCommand(`/api/ncrs/${encodeURIComponent(id)}/submit`, {})
 }
+
+/** C1: the fix is accepted and the NCR becomes Closed. */
+export function verifyNcr(id: string): Promise<void> {
+  return postCommand(`/api/ncrs/${encodeURIComponent(id)}/verify`, {})
+}
+
+/** C2: the fix goes back to the investigator, with the reason in the history. */
+export function rejectVerification(id: string, reason: string): Promise<void> {
+  return postCommand(`/api/ncrs/${encodeURIComponent(id)}/reject`, { reason })
+}

@@ -3,7 +3,8 @@ import type { Ncr } from '../api/ncrs.ts'
 
 // Which controls a user is shown (PRD §4). The API enforces the same rules; these only hide what it would refuse.
 
-export function canTriage(user: CurrentUser): boolean {
+// Triage (A2, A3) and verification (C1, C2)
+export function isQaManager(user: CurrentUser): boolean {
   return user.role === 'QaManager'
 }
 

@@ -11,10 +11,11 @@ import HistoryTimeline from './HistoryTimeline.tsx'
 import InvestigationControls from './InvestigationControls.tsx'
 import NcrNotFound from './NcrNotFound.tsx'
 import OverdueBadge from './OverdueBadge.tsx'
-import { canTriage, isAssignedInvestigator } from './permissions.ts'
+import { isAssignedInvestigator, isQaManager } from './permissions.ts'
 import SeverityBadge from './SeverityBadge.tsx'
 import StatusBadge from './StatusBadge.tsx'
 import TriageControls from './TriageControls.tsx'
+import VerificationControls from './VerificationControls.tsx'
 
 type NcrDetailProps = {
   id: string
@@ -79,7 +80,9 @@ function NcrDetail({ id, currentUser }: NcrDetailProps) {
         </dl>
       </section>
 
-      {canTriage(currentUser) && <TriageControls ncr={ncr} />}
+      {isQaManager(currentUser) && <VerificationControls ncr={ncr} />}
+
+      {isQaManager(currentUser) && <TriageControls ncr={ncr} />}
 
       {isAssignedInvestigator(ncr, currentUser) && <InvestigationControls ncr={ncr} />}
 

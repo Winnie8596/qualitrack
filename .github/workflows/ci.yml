@@ -60,3 +60,60 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  # The browser smoke test (plan.md S5): the real API and web app against a real database, in Chromium
+  e2e:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        # A throwaway database that lives as long as this job, so its password guards nothing
+        env:
+          POSTGRES_DB: qualitrack
+          POSTGRES_PASSWORD: e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      E2E_CONNECTION_STRING: Host=localhost;Port=5432;Database=qualitrack;Username=postgres;Password=e2e
+      E2E_DEMO_PASSWORD: E2e-Demo-Password-1
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      # The API's https profile needs a certificate to listen with; the dev server's proxy does not check it
+      - name: Create development certificate
+        run: dotnet dev-certs https
+
+      - name: Install
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run smoke test
+        run: npm run e2e
+
+      - name: Upload report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: web/playwright-report
+          retention-days: 7
