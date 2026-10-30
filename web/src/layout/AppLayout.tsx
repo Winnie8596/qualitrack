@@ -1,12 +1,16 @@
-import type { ReactNode } from 'react'
+import { NavLink, Outlet } from 'react-router'
+import { useAuth } from '../auth/authContext.ts'
+import { roleLabels } from '../auth/roleLabels.ts'
 
-type AppLayoutProps = {
-  children: ReactNode
+function navLinkClass({ isActive }: { isActive: boolean }) {
+  return isActive ? 'font-semibold text-blue-800 underline underline-offset-4' : 'text-slate-700 hover:text-blue-800'
 }
 
 // One banner, one main and one contentinfo landmark on every page, so screen reader users can jump
 // between them; each page brings its own <h1> inside main.
-function AppLayout({ children }: AppLayoutProps) {
+function AppLayout() {
+  const auth = useAuth()
+
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900">
       <a
@@ -17,8 +21,32 @@ function AppLayout({ children }: AppLayoutProps) {
       </a>
 
       <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center px-4 py-3">
+        <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-3">
           <p className="text-lg font-semibold tracking-tight">QualiTrack</p>
+
+          {auth.status === 'signedIn' && (
+            <>
+              <nav aria-label="Main">
+                <ul className="flex gap-4">
+                  <li>
+                    <NavLink to="/" end className={navLinkClass}>
+                      Home
+                    </NavLink>
+                  </li>
+                  {auth.user.role === 'Inspector' && (
+                    <li>
+                      <NavLink to="/ncrs/new" className={navLinkClass}>
+                        Raise an NCR
+                      </NavLink>
+                    </li>
+                  )}
+                </ul>
+              </nav>
+              <p className="text-sm text-slate-600 sm:ml-auto">
+                {auth.user.email} ({roleLabels[auth.user.role]})
+              </p>
+            </>
+          )}
         </div>
       </header>
 
@@ -28,7 +56,7 @@ function AppLayout({ children }: AppLayoutProps) {
         tabIndex={-1}
         className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 focus:outline-hidden"
       >
-        {children}
+        <Outlet />
       </main>
 
       <footer className="border-t border-slate-200 bg-white">
