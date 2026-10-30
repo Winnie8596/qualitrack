@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import AppLayout from './layout/AppLayout.tsx'
 
 type ApiStatus = 'checking' | 'healthy' | 'unreachable'
 
@@ -22,10 +23,12 @@ function App() {
   }, [])
 
   return (
-    <main>
-      <h1>QualiTrack</h1>
-      <p role="status">API status: {status}</p>
-    </main>
+    <AppLayout>
+      <h1 className="text-2xl font-semibold">QualiTrack</h1>
+      <p role="status" className="mt-2 text-slate-700">
+        API status: {status}
+      </p>
+    </AppLayout>
   )
 }
 
