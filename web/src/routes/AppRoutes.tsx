@@ -3,6 +3,7 @@ import ProtectedRoute from '../auth/ProtectedRoute.tsx'
 import AppLayout from '../layout/AppLayout.tsx'
 import HomePage from '../pages/HomePage.tsx'
 import LoginPage from '../pages/LoginPage.tsx'
+import NcrDetailPage from '../pages/NcrDetailPage.tsx'
 import NotFoundPage from '../pages/NotFoundPage.tsx'
 import RaiseNcrPage from '../pages/RaiseNcrPage.tsx'
 
@@ -15,6 +16,7 @@ function AppRoutes() {
 
         <Route element={<ProtectedRoute />}>
           <Route index element={<HomePage />} />
+          <Route path="ncrs/:id" element={<NcrDetailPage />} />
         </Route>
 
         <Route element={<ProtectedRoute allow={['Inspector']} />}>

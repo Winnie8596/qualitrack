@@ -79,12 +79,25 @@ export function forgetAntiforgeryToken(): void {
   antiforgeryToken = undefined
 }
 
-/** A write as the signed-in user, carrying the antiforgery token the API requires. */
-export async function postJson<T>(path: string, body: unknown, schema: z.ZodType<T>): Promise<T> {
-  const response = await send(path, {
+function post(path: string, body: unknown, headers: Record<string, string> = {}): Promise<Response> {
+  return send(path, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'X-XSRF-TOKEN': await currentAntiforgeryToken() },
+    headers: { 'Content-Type': 'application/json', ...headers },
     body: JSON.stringify(body),
   })
-  return parse(response, schema)
+}
+
+/** A write as the signed-in user, carrying the antiforgery token the API requires. */
+export async function postJson<T>(path: string, body: unknown, schema: z.ZodType<T>): Promise<T> {
+  return parse(await post(path, body, { 'X-XSRF-TOKEN': await currentAntiforgeryToken() }), schema)
+}
+
+// Signing in and out only: the API asks no token of them, and before sign-in there is no user to fetch one for.
+
+export async function postJsonWithoutAntiforgery<T>(path: string, body: unknown, schema: z.ZodType<T>): Promise<T> {
+  return parse(await post(path, body), schema)
+}
+
+export async function postWithoutAntiforgery(path: string): Promise<void> {
+  await post(path, {})
 }

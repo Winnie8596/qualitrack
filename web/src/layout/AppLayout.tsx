@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router'
 import { useAuth } from '../auth/useAuth.ts'
 import { roleLabels } from '../auth/roleLabels.ts'
+import SignOutButton from '../auth/SignOutButton.tsx'
 
 function navLinkClass({ isActive }: { isActive: boolean }) {
   return isActive ? 'font-semibold text-blue-800 underline underline-offset-4' : 'text-slate-700 hover:text-blue-800'
@@ -42,9 +43,12 @@ function AppLayout() {
                   )}
                 </ul>
               </nav>
-              <p className="text-sm text-slate-600 sm:ml-auto">
-                {auth.user.email} ({roleLabels[auth.user.role]})
-              </p>
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 sm:ml-auto">
+                <p className="text-sm text-slate-600">
+                  {auth.user.email} ({roleLabels[auth.user.role]})
+                </p>
+                <SignOutButton />
+              </div>
             </>
           )}
         </div>

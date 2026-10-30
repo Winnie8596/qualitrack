@@ -221,8 +221,8 @@ Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is 
 - [x] Tailwind CSS (ADR 0007 records the choice); app layout with semantic landmarks
 - [x] Routing, auth context from `/api/auth/me`, protected routes per role (React Router, ADR 0008)
 - [x] Typed API client (`web/src/api/`) using `fetch` + TanStack Query; ProblemDetails surfaced as form/field errors (responses checked with Zod; `toFormErrors` is wired into the forms with the form task)
-- [ ] Login page; Raise NCR form (React Hook Form + Zod); NCR detail page with status badge
-- [ ] Component tests for the login form, raise form and status badge (Vitest + Testing Library)
+- [x] Login page; Raise NCR form (React Hook Form + Zod); NCR detail page with status badge
+- [x] Component tests for the login form, raise form and status badge (Vitest + Testing Library)
 
 **Done when:** the slice definition of done holds; an Inspector can log in, raise an NCR and see it in the browser; unauthenticated calls get 401; writes without an antiforgery token are rejected; security headers are on every response; Testcontainers tests pass in CI (Docker on `ubuntu-latest`).
 
