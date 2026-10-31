@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import type { CurrentUser } from '../api/auth.ts'
 import { ApiError } from '../api/client.ts'
-import { ncrQueryOptions } from '../api/ncrs.ts'
+import { ncrQueryOptions, photoUrl } from '../api/ncrs.ts'
 import FormAlert from '../forms/FormAlert.tsx'
 import CorrectiveActions from './CorrectiveActions.tsx'
 import DateTime from './DateTime.tsx'
@@ -20,12 +20,14 @@ import VerificationControls from './VerificationControls.tsx'
 type NcrDetailProps = {
   id: string
   currentUser: CurrentUser
+  // Set right after raising, when the NCR was saved but its photo was refused or lost on the way
+  photoNotAttached?: boolean
 }
 
 const sectionHeadingClass = 'text-lg font-semibold'
 
 /** Everything known about one NCR (D2, without the photo until S7). */
-function NcrDetail({ id, currentUser }: NcrDetailProps) {
+function NcrDetail({ id, currentUser, photoNotAttached = false }: NcrDetailProps) {
   const { data: ncr, error, isPending } = useQuery(ncrQueryOptions(id))
 
   if (isPending) {
@@ -43,6 +45,9 @@ function NcrDetail({ id, currentUser }: NcrDetailProps) {
       <h1 className="text-2xl font-semibold">
         {ncr.number}: {ncr.title}
       </h1>
+      {photoNotAttached && (
+        <FormAlert message="The NCR was raised, but its photo could not be attached. Check it is a JPEG or PNG of 5 MB or less." />
+      )}
 
       <section aria-labelledby="ncr-details">
         <h2 id="ncr-details" className={sectionHeadingClass}>
@@ -83,6 +88,19 @@ function NcrDetail({ id, currentUser }: NcrDetailProps) {
       {isQaManager(currentUser) && <VerificationControls ncr={ncr} />}
 
       {isQaManager(currentUser) && <TriageControls ncr={ncr} />}
+
+      {ncr.hasPhoto && (
+        <section aria-labelledby="ncr-photo">
+          <h2 id="ncr-photo" className={sectionHeadingClass}>
+            Photo
+          </h2>
+          <img
+            src={photoUrl(ncr.id)}
+            alt={`Photo of ${ncr.title}`}
+            className="mt-2 max-h-96 w-auto max-w-full rounded border border-slate-200"
+          />
+        </section>
+      )}
 
       {isAssignedInvestigator(ncr, currentUser) && <InvestigationControls ncr={ncr} />}
 

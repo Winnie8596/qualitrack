@@ -40,9 +40,19 @@ test('an NCR goes from raised to closed with each role doing its part in the bro
   await inspector.getByLabel('Description').fill('Sharp burr on the mating face.')
   await inspector.getByLabel('Location').fill('Line 3')
   await inspector.getByRole('radio', { name: 'Major' }).check()
+  // The smallest valid PNG: one transparent pixel
+  await inspector.getByLabel('Photo (optional)').setInputFiles({
+    name: 'flange.png',
+    mimeType: 'image/png',
+    buffer: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+      'base64',
+    ),
+  })
   await inspector.getByRole('button', { name: 'Raise NCR' }).click()
   await expect(inspector.getByRole('heading', { level: 1, name: new RegExp(title) })).toBeVisible()
   await expectStatus(inspector, 'Open')
+  await expect(inspector.getByRole('img', { name: `Photo of ${title}` })).toHaveJSProperty('naturalWidth', 1)
   const ncrPath = new URL(inspector.url()).pathname
 
   // D1 and A2: the QA manager finds it in the list and assigns the investigator
