@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
-import { getJson, postCommand, postJson } from './client.ts'
+import { getJson, postCommand, postFormCommand, postJson } from './client.ts'
 
 // The API sends enums by name (JsonStringEnumConverter), so these match the C# enums one for one.
 export const severitySchema = z.enum(['Minor', 'Major', 'Critical'])
@@ -54,6 +54,7 @@ const ncrSchema = z.object({
   rootCause: z.string().nullable(),
   actions: z.array(correctiveActionSchema),
   history: z.array(statusChangeSchema),
+  hasPhoto: z.boolean(),
 })
 
 export type Ncr = z.infer<typeof ncrSchema>
@@ -162,4 +163,20 @@ export function verifyNcr(id: string): Promise<void> {
 /** C2: the fix goes back to the investigator, with the reason in the history. */
 export function rejectVerification(id: string, reason: string): Promise<void> {
   return postCommand(`/api/ncrs/${encodeURIComponent(id)}/reject`, { reason })
+}
+
+// A1: what the API accepts as a photo; it checks the file's own bytes again
+export const photoTypes = ['image/jpeg', 'image/png'] as const
+export const maxPhotoBytes = 5 * 1024 * 1024
+
+/** A1: the NCR's one optional photo, attached by the inspector who raised it. */
+export function attachPhoto(id: string, photo: File): Promise<void> {
+  const form = new FormData()
+  form.append('photo', photo)
+  return postFormCommand(`/api/ncrs/${encodeURIComponent(id)}/photo`, form)
+}
+
+/** D2: where the browser loads the photo from, with the session cookie, like any same-origin image. */
+export function photoUrl(id: string): string {
+  return `/api/ncrs/${encodeURIComponent(id)}/photo`
 }

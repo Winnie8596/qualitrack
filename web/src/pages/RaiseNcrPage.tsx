@@ -5,8 +5,9 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from 'zod'
 import { toFormErrors } from '../api/formErrors.ts'
-import { raiseNcr, severitySchema } from '../api/ncrs.ts'
+import { attachPhoto, maxPhotoBytes, photoTypes, raiseNcr, severitySchema, type RaiseNcrRequest } from '../api/ncrs.ts'
 import { primaryButtonClass } from '../forms/fieldClass.ts'
+import FileField from '../forms/FileField.tsx'
 import FormAlert from '../forms/FormAlert.tsx'
 import TextAreaField from '../forms/TextAreaField.tsx'
 import TextField from '../forms/TextField.tsx'
@@ -17,6 +18,13 @@ const raiseSchema = z.object({
   description: z.string().trim().min(1, 'Enter a description.'),
   location: z.string().trim().min(1, 'Enter a location.'),
   severity: z.enum(severitySchema.options, { error: 'Choose a severity.' }),
+  // A1: optional; the file input gives a FileList, of which only the first file is used
+  photo: z
+    .custom<FileList>()
+    .optional()
+    .transform((files) => files?.item(0) ?? undefined)
+    .refine((file) => !file || photoTypes.some((type) => type === file.type), 'Choose a JPEG or PNG image.')
+    .refine((file) => !file || file.size <= maxPhotoBytes, 'Choose a photo of 5 MB or less.'),
 })
 
 type RaiseForm = z.input<typeof raiseSchema>
@@ -36,8 +44,19 @@ function RaiseNcrPage() {
     defaultValues: { title: '', description: '', location: '' },
   })
   const raise = useMutation({
-    mutationFn: raiseNcr,
-    onSuccess: (id) => navigate(`/ncrs/${id}`),
+    mutationFn: async ({ photo, ...request }: RaiseNcrRequest & { photo?: File }) => {
+      const id = await raiseNcr(request)
+      if (!photo) {
+        return { id, photoAttached: true }
+      }
+      // The NCR exists by now, so a photo that fails is reported on its page rather than failing the raise
+      const photoAttached = await attachPhoto(id, photo).then(
+        () => true,
+        () => false,
+      )
+      return { id, photoAttached }
+    },
+    onSuccess: ({ id, photoAttached }) => navigate(`/ncrs/${id}`, { state: { photoAttached } }),
     onError: (error) => {
       const { fields } = toFormErrors(error, raiseFields)
       for (const field of raiseFields) {
@@ -84,6 +103,14 @@ function RaiseNcrPage() {
             </p>
           )}
         </fieldset>
+
+        <FileField
+          label="Photo (optional)"
+          registration={register('photo')}
+          accept={photoTypes.join(',')}
+          hint="A JPEG or PNG image of 5 MB or less."
+          error={errors.photo?.message}
+        />
 
         <button type="submit" disabled={raise.isPending} className={primaryButtonClass}>
           {raise.isPending ? 'Raising…' : 'Raise NCR'}

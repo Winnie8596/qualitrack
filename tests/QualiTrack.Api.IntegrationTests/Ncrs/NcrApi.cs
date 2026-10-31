@@ -149,7 +149,8 @@ internal sealed record NcrDetail(
     DateTimeOffset? DueDate,
     string? RootCause,
     IReadOnlyList<NcrActionDetail> Actions,
-    IReadOnlyList<NcrStatusChange> History);
+    IReadOnlyList<NcrStatusChange> History,
+    bool HasPhoto);
 
 internal sealed record NcrActionDetail(Guid Id, string Description, DateTimeOffset? CompletedAt);
 

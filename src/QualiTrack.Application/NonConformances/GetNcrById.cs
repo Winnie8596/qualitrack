@@ -24,7 +24,8 @@ public sealed record NcrView(
     bool IsOverdue,
     string? RootCause,
     IReadOnlyList<CorrectiveActionView> Actions,
-    IReadOnlyList<StatusChangeView> History);
+    IReadOnlyList<StatusChangeView> History,
+    bool HasPhoto);
 
 public sealed record CorrectiveActionView(
     Guid Id, string Description, Guid AddedBy, DateTimeOffset AddedAt, Guid? CompletedBy, DateTimeOffset? CompletedAt);
@@ -62,7 +63,8 @@ public sealed class GetNcrByIdHandler(INcrRepository repository, IClock clock, I
             ncr.IsOverdue(now),
             ncr.RootCause,
             [.. ncr.Actions.Select(ToView)],
-            [.. ncr.History.Select(ToView)]);
+            [.. ncr.History.Select(ToView)],
+            ncr.Photo is not null);
 
     private static CorrectiveActionView ToView(CorrectiveAction action) =>
         new(

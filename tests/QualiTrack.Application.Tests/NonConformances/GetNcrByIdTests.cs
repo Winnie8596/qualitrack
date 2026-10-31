@@ -37,7 +37,8 @@ public sealed class GetNcrByIdTests
             IsOverdue: false,
             "Wrong electrode for the steel grade",
             [new CorrectiveActionView(action.Id, "Grind out the weld", _investigator.Value, Ncrs.RaisedAt.AddHours(2), null, null)],
-            [.. ncr.History.Select(change => new StatusChangeView(change.From, change.To, change.Stamp.By.Value, change.Stamp.At, change.Note))]);
+            [.. ncr.History.Select(change => new StatusChangeView(change.From, change.To, change.Stamp.By.Value, change.Stamp.At, change.Note))],
+            HasPhoto: false);
         Assert.Equal(expected with { Actions = [], History = [] }, view with { Actions = [], History = [] });
         Assert.Equal(expected.Actions, view.Actions);
         Assert.Equal(expected.History, view.History);

@@ -55,6 +55,9 @@ public sealed class NonConformance
 
     public string? RootCause { get; private set; }
 
+    /// <summary>The format of the NCR's one optional photo (A1), or <c>null</c> when it has none.</summary>
+    public PhotoFormat? Photo { get; private set; }
+
     public IReadOnlyList<CorrectiveAction> Actions => _actions;
 
     public IReadOnlyList<StatusChange> History => _history;
@@ -179,6 +182,23 @@ public sealed class NonConformance
     {
         _history.Add(new StatusChange(Status, to, stamp, note));
         Status = to;
+    }
+
+    // A1. Not a status change, so not in the history. Only while open: it records what was found, not later work.
+    public void AttachPhoto(PhotoFormat format, AuditStamp stamp)
+    {
+        EnsureStatus(NcrStatus.Open);
+        if (stamp.By != Raised.By)
+        {
+            throw DomainException.NotPermitted("Only the inspector who raised the NCR can attach its photo.");
+        }
+
+        if (Photo is not null)
+        {
+            throw DomainException.InvalidState("An NCR has at most one photo.");
+        }
+
+        Photo = format;
     }
 
     private void EnsureStatus(NcrStatus required)

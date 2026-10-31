@@ -32,6 +32,7 @@ const investigatingNcr = {
       note: null,
     },
   ],
+  hasPhoto: false,
 }
 
 afterEach(() => {

@@ -1,4 +1,4 @@
-import { useParams } from 'react-router'
+import { useLocation, useParams } from 'react-router'
 import { z } from 'zod'
 import { useAuth } from '../auth/useAuth.ts'
 import NcrDetail from '../ncrs/NcrDetail.tsx'
@@ -10,6 +10,7 @@ const idSchema = z.guid()
 function NcrDetailPage() {
   const id = idSchema.safeParse(useParams().id)
   const auth = useAuth()
+  const photoNotAttached = (useLocation().state as { photoAttached?: boolean } | null)?.photoAttached === false
 
   if (!id.success) {
     return <NcrNotFound />
@@ -18,7 +19,7 @@ function NcrDetailPage() {
   if (auth.status !== 'signedIn') {
     return null
   }
-  return <NcrDetail id={id.data} currentUser={auth.user} />
+  return <NcrDetail id={id.data} currentUser={auth.user} photoNotAttached={photoNotAttached} />
 }
 
 export default NcrDetailPage

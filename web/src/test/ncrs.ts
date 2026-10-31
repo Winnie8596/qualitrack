@@ -19,6 +19,7 @@ export function anNcr(overrides: Partial<Ncr> = {}): Ncr {
     rootCause: null,
     actions: [],
     history: [],
+    hasPhoto: false,
     ...overrides,
   }
 }

@@ -97,6 +97,11 @@ export async function postCommand(path: string, body: unknown): Promise<void> {
   await post(path, body, { 'X-XSRF-TOKEN': await currentAntiforgeryToken() })
 }
 
+/** A file upload as the signed-in user. The browser sets the multipart Content-Type, with its boundary. */
+export async function postFormCommand(path: string, form: FormData): Promise<void> {
+  await send(path, { method: 'POST', headers: { 'X-XSRF-TOKEN': await currentAntiforgeryToken() }, body: form })
+}
+
 // Signing in and out only: the API asks no token of them, and before sign-in there is no user to fetch one for.
 
 export async function postJsonWithoutAntiforgery<T>(path: string, body: unknown, schema: z.ZodType<T>): Promise<T> {

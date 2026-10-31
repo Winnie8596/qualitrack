@@ -86,4 +86,65 @@ describe('RaiseNcrPage', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Only inspectors can raise NCRs.')
   })
+
+  it('attaches the photo chosen once the NCR is raised, then opens it', async () => {
+    const ncr = anNcr({ hasPhoto: true })
+    const fetchMock = stubApi({
+      ...signedInAs('Inspector'),
+      'POST /api/ncrs': () => json({ id: ncr.id }, 201),
+      [`POST /api/ncrs/${ncr.id}/photo`]: () => new Response(null, { status: 204 }),
+      [`GET /api/ncrs/${ncr.id}`]: () => json(ncr),
+    })
+    const { user } = renderApp('/ncrs/new')
+    const photo = new File([new Uint8Array([0x89, 0x50, 0x4e, 0x47])], 'weld.png', { type: 'image/png' })
+
+    await fillIn(user)
+    await user.upload(screen.getByLabelText('Photo (optional)'), photo)
+    await user.click(screen.getByRole('button', { name: 'Raise NCR' }))
+
+    expect(await screen.findByRole('img', { name: /Photo of/ })).toHaveAttribute('src', `/api/ncrs/${ncr.id}/photo`)
+    const upload = fetchMock.mock.calls.find(([url, init]) => url === `/api/ncrs/${ncr.id}/photo` && init?.method === 'POST')
+    const body = upload?.[1]?.body
+    expect(body).toBeInstanceOf(FormData)
+    expect((body as FormData).get('photo')).toBe(photo)
+    expect(new Headers(upload?.[1]?.headers).get('X-XSRF-TOKEN')).toBe('test-token')
+  })
+
+  it.each([
+    ['a GIF', new File(['GIF89a'], 'weld.gif', { type: 'image/gif' }), 'Choose a JPEG or PNG image.'],
+    ['a file over 5 MB', new File([new Uint8Array(5 * 1024 * 1024 + 1)], 'weld.png', { type: 'image/png' }), 'Choose a photo of 5 MB or less.'],
+  ])('refuses %s before sending anything', async (_what, photo, message) => {
+    const fetchMock = stubApi(signedInAs('Inspector'))
+    const { user } = renderApp('/ncrs/new')
+
+    await fillIn(user)
+    // applyAccept off: the browser's picker filters by type, but a user can still drop in any file
+    await userWithoutAccept(user).upload(screen.getByLabelText('Photo (optional)'), photo)
+    await user.click(screen.getByRole('button', { name: 'Raise NCR' }))
+
+    expect(screen.getByLabelText('Photo (optional)')).toHaveAccessibleDescription(message)
+    expect(callsTo(fetchMock, 'POST /api/ncrs')).toHaveLength(0)
+  })
+
+  it('still opens the raised NCR when its photo could not be attached, and says so', async () => {
+    const ncr = anNcr()
+    stubApi({
+      ...signedInAs('Inspector'),
+      'POST /api/ncrs': () => json({ id: ncr.id }, 201),
+      [`POST /api/ncrs/${ncr.id}/photo`]: () => problem(400, { detail: 'A photo must be a JPEG or PNG image.' }),
+      [`GET /api/ncrs/${ncr.id}`]: () => json(ncr),
+    })
+    const { user } = renderApp('/ncrs/new')
+
+    await fillIn(user)
+    await user.upload(screen.getByLabelText('Photo (optional)'), new File([new Uint8Array([1])], 'weld.png', { type: 'image/png' }))
+    await user.click(screen.getByRole('button', { name: 'Raise NCR' }))
+
+    expect(await screen.findByRole('heading', { level: 1, name: /Weld crack on bracket/ })).toBeInTheDocument()
+    expect(screen.getByRole('alert')).toHaveTextContent('raised, but its photo could not be attached')
+  })
 })
+
+function userWithoutAccept(user: UserEvent): UserEvent {
+  return user.setup({ applyAccept: false })
+}

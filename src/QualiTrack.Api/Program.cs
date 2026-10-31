@@ -39,6 +39,10 @@ builder.Services.AddPersistence(connectionString);
 
 // Optional: without it the dashboard caches in memory (see AddDashboard). Not a secret, so it may live in appsettings.
 builder.Services.AddDashboard(builder.Configuration.GetConnectionString("Redis"));
+
+// Relative to the content root unless absolute, e.g. a Docker volume's mount point
+builder.Services.AddFileStore(Path.Combine(
+    builder.Environment.ContentRootPath, builder.Configuration["FileStore:Root"] ?? "App_Data/photos"));
 builder.Services.AddCookieAuthentication();
 builder.Services.AddLoginRateLimit(builder.Configuration);
 builder.Services.AddAntiforgeryProtection();
