@@ -5,7 +5,7 @@
 Track non-conformance reports (NCRs) and their corrective actions from report to verified close,
 with every change audited. Built with ASP.NET Core (.NET 10), PostgreSQL and React + TypeScript.
 
-> Work in progress: Phases 0–6 are done; quality pass and deployment remain. See [`plan.md`](plan.md).
+> Work in progress: Phases 0–7 are done; deployment remains. See [`plan.md`](plan.md).
 
 ## Run it
 

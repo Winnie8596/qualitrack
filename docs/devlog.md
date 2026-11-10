@@ -2,6 +2,62 @@
 
 What happened in each phase, what was decided, and what was learned. Newest phase first.
 
+## Phase 7 — Quality pass
+
+**Built**
+
+- `AnalysisLevel` raised from `latest` to `latest-recommended`; the build is still zero warnings.
+- Coverage in CI: coverlet collects per test project, `scripts/check_coverage.py` merges the three
+  reports, writes the table to the job summary and fails the `api` job when Domain is below 95 % or
+  Application below 85 %. Measured: Domain 98.8 %, Application 99.1 %, Infrastructure 98.4 %,
+  Api 96.6 %.
+- Every file in `src/` and `web/src/` read against the clean code checklist.
+
+**Analyzer findings, all fixed, none suppressed**
+
+| Rule | Finding | Fix |
+| --- | --- | --- |
+| CA1716 | The type `Error` is a keyword in other .NET languages | Renamed to `UseCaseError` |
+| CA1000 | `Result<T>.Success` / `.Failure` were static members on a generic type | Removed; nothing called them, the implicit conversions build the result |
+| CA1725 | `OnModelCreating(modelBuilder)` named its parameter differently from its base | Renamed to `builder` |
+| CA1711 | `ApiCollection`, `PostgresCollection` end in "Collection" but are not collections | Renamed to `ApiTestGroup`, `PostgresTestGroup` |
+
+**Smells found and fixed**
+
+| Checklist item | Where | What was wrong | Fix |
+| --- | --- | --- | --- |
+| ≤ 3 parameters | `DemoData/DemoNcrCatalogue`, `DemoNcrBuilder` | Helpers took 4 to 8 strings in a row; `Build` took 4 arguments | Entries read `Major(title, description, location).Closed(fix)`; the builder holds the cast |
+| No dead code | `DemoNcrBuilder.TimeNeededFor` | Written, never called | Deleted |
+| Command–query separation | `IFileStore.SaveAsync` | A command that returned the key it had just been given; no caller used it | Returns `Task` |
+| Names reveal intent | `IFileStore` | The same thing was `fileName` in one method and `key` in the other | `key` in both |
+| No duplicated knowledge | `PhotoFormat` | "5 MB" in the message beside `MaxLength = 5 * 1024 * 1024` | The message is built from the constant |
+| No duplicated knowledge | `web`: raise form, NCR page | "5 MB" typed in three messages beside `maxPhotoBytes` | One `maxPhotoSize` |
+| No magic numbers | `LocalFileStore`, `NcrNumber` | `81920` twice; year bounds `1000` and `9999` inline | Named constants |
+| Comments explain why | `NcrEndpoints`, `SecurityHeaders` | Two comments described the code as it was two phases ago | Rewritten |
+
+**Reviewed and kept, with the reason**
+
+- **Handlers take 3 to 5 constructor dependencies**, and `NcrDetails` and the view records have more
+  than three fields. The rule is about a caller having to get a row of arguments in the right
+  order; a container fills constructors, and the records *are* the grouping the rule asks for.
+- **Each handler repeats `if (currentUser.Role != ...) return Forbidden(...)`.** The shape repeats;
+  the knowledge does not: each line is that use case's own rule and message, visible at the top of
+  its handler. A shared helper would save one line and hide it.
+- **`!` in request DTOs** (`Title!`): each has a comment saying validation has already rejected a
+  missing value, which is the exception rule 6 allows.
+- **`86400` in the dashboard's SQL**: seconds per day inside a raw query, with the unit in the
+  column it produces.
+- **Dead code, unused packages, TODOs:** none found beyond `TimeNeededFor`. Every NuGet and npm
+  package is referenced; `@testing-library/dom` and the `@types/*` packages are peer and type
+  dependencies, not unused.
+
+**Learned**
+
+- Coverage per test project undercounts: the domain looked 90 % covered until the reports were
+  merged by class and line and generated code (the regex source generator) was excluded.
+- The file with the most checklist findings was the newest one. Reviewing your own latest code with
+  the same list as everyone else's is the point of the pass.
+
 ## Phase 6 — Cross-cutting
 
 **Built**
@@ -44,6 +100,26 @@ What happened in each phase, what was decided, and what was learned. Newest phas
   immediately were flaky; they now wait for the span.
 - A new Docker volume takes its ownership from the folder it is mounted over, so the image creates
   `/data` owned by the unprivileged user before switching to it.
+
+## Phases 1–5 — in brief
+
+Written up in Phase 7 from the pull requests; the detail is in each PR and in the ADRs.
+
+- **Phase 1, domain (PRs #3–#5).** BR-1 … BR-9 in `QualiTrack.Domain`, test-first, with no
+  packages. Time and user arrive as an `AuditStamp` ([ADR 0003](adr/0003-time-and-user-passed-into-the-domain.md)).
+- **Phase 2, application (PRs #6, #7).** One handler per command, `Result` at the boundary and
+  exceptions inside ([ADR 0005](adr/0005-exceptions-inside-results-at-the-boundary.md)); rules stay
+  in the domain ([ADR 0002](adr/0002-business-rules-live-in-the-domain.md)).
+- **Phase 3, slice S1 (PR #8).** EF Core on PostgreSQL with actions and history as JSON columns,
+  tested against a real database ([ADR 0004](adr/0004-testcontainers-over-in-memory-database.md));
+  cookie sessions with antiforgery ([ADR 0006](adr/0006-cookie-auth-over-jwt.md)); the React app
+  with Tailwind ([ADR 0007](adr/0007-tailwind-css-for-styling.md)) and React Router
+  ([ADR 0008](adr/0008-react-router-for-routing.md)).
+- **Phase 4, slices S2–S7 (PRs #9–#14).** List with indexes measured by `EXPLAIN ANALYZE`
+  ([notes](learning/sql-indexes.md)), triage, investigator work, verification with a Playwright
+  run of the whole lifecycle, the dashboard cached in Redis, and the photo.
+- **Phase 5, browser quality (PR #15).** Keyboard-only lifecycle, axe with no WCAG 2.2 AA
+  violations, Lighthouse, 375 px layout, and the [OWASP Top 10 notes](learning/owasp-top-10.md).
 
 ## Phase 0 — Walking skeleton
 
