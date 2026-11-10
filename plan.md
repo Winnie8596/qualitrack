@@ -246,7 +246,7 @@ Goal: each slice leaves one more user story working end to end. Do them in order
 ## Phase 5 — Whole-app quality in the browser
 
 - [x] Keyboard-only run of the whole lifecycle; axe/Lighthouse accessibility ≥ 90 on every page (`e2e/keyboard.spec.ts` and `e2e/accessibility.spec.ts`: no WCAG 2.2 A/AA violations from axe on any page; `npm run lighthouse`: accessibility 100 on every page)
-- [x] Lighthouse performance ≥ 90 on the NCR list page; route-level code splitting (98 under Lighthouse's mobile profile, on the production build)
+- [x] Lighthouse performance ≥ 90 on the NCR list page; route-level code splitting (91–98 across runs under Lighthouse's mobile profile, on the production build; it varies with machine load)
 - [x] Responsive layout checked at 375 px and 1280 px on every page (`e2e/responsive.spec.ts`: no sideways scroll, screenshots in `test-results/`)
 - [x] `docs/learning/owasp-top-10.md`: each OWASP Top 10 item, and where QualiTrack defends against it (or why it doesn't apply)
 
