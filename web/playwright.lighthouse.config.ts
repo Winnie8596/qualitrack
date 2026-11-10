@@ -31,6 +31,9 @@ export default defineConfig({
         DemoUsers__Inspector: demoPassword,
         DemoUsers__Investigator: demoPassword,
         DemoUsers__QaManager: demoPassword,
+        // Every spec signs in afresh from the one address, far past the 5-a-minute guard against password
+        // guessing; the API's integration tests check that limit itself
+        LoginRateLimit__PermitLimit: '1000',
       },
     },
     {
