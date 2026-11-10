@@ -2,6 +2,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.HttpLogging;
 using QualiTrack.Api.Authentication;
 using QualiTrack.Api.Dashboard;
+using QualiTrack.Api.DemoData;
 using QualiTrack.Api.Http;
 using QualiTrack.Api.Ncrs;
 using QualiTrack.Api.Users;
@@ -67,6 +68,7 @@ if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
 if (app.Configuration.GetValue<bool>("DemoData:Seed"))
 {
     await app.Services.SeedDemoUsersAsync();
+    await app.Services.SeedDemoNcrsAsync();
 }
 
 // First, so every response gets them, whatever later in the pipeline answers it

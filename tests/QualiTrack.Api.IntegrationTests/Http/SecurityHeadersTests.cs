@@ -27,9 +27,11 @@ public sealed class SecurityHeadersTests(QualiTrackApiFactory api)
     public async Task An_unhandled_exception_still_carries_the_security_headers()
     {
         // The exception handler clears the response's headers before it writes the 500, so this is the case
-        // that shows the headers are added as the response starts, not before the endpoint runs
-        using var failing = api.WithWebHostBuilder(builder => builder.ConfigureTestServices(services =>
-            services.AddScoped<INcrRepository, FailingNcrRepository>()));
+        // that shows the headers are added as the response starts, not before the endpoint runs. Seeding is off
+        // for this host: it reads the repository as the app starts, and the failure belongs in the request.
+        using var failing = api.WithWebHostBuilder(builder => builder
+            .UseSetting("DemoData:Seed", "false")
+            .ConfigureTestServices(services => services.AddScoped<INcrRepository, FailingNcrRepository>()));
         var client = Client(failing);
         var login = await client.PostAsJsonAsync(
             "/api/auth/login", new { email = "qamanager@qualitrack.demo", password = QualiTrackApiFactory.DemoPassword });

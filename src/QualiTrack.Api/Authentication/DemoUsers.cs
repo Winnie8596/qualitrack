@@ -8,6 +8,8 @@ public static class DemoUsers
 {
     private const string Section = "DemoUsers";
 
+    public static string EmailOf(Role role) => $"{role.ToString().ToLowerInvariant()}@qualitrack.demo";
+
     public static async Task SeedDemoUsersAsync(this IServiceProvider services)
     {
         await using var scope = services.CreateAsyncScope();
@@ -36,7 +38,7 @@ public static class DemoUsers
     // An existing user is left alone, so seeding on every start keeps any password changed since
     private static async Task EnsureUserAsync(UserManager<IdentityUser<Guid>> users, Role role, string password)
     {
-        var email = $"{role.ToString().ToLowerInvariant()}@qualitrack.demo";
+        var email = EmailOf(role);
         if (await users.FindByEmailAsync(email) is not null)
         {
             return;

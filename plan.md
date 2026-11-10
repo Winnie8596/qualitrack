@@ -257,7 +257,7 @@ Goal: each slice leaves one more user story working end to end. Do them in order
 ## Phase 6 — Cross-cutting
 
 - [ ] Configuration per environment (`appsettings.*.json` + environment variables); `.env.example` complete
-- [ ] Seed script with ~50 realistic NCRs across states for the demo
+- [x] Seed script with ~50 realistic NCRs across states for the demo (`DemoData/`: 50 NCRs built through the aggregate with past audit stamps, seeded into an empty database where `DemoData:Seed` is on)
 - [ ] Multi-stage `Dockerfile` for Api (serves built `web/` as static files) and full `docker compose up` run
 - [ ] `docs/adr/0003-time-and-user-passed-into-the-domain.md`
 - [ ] OpenTelemetry tracing and metrics for API + EF Core; request duration visible locally
