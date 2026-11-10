@@ -12,7 +12,10 @@ type CompleteActionButtonProps = {
 const secondaryButtonClass =
   'rounded border border-blue-700 px-3 py-1 text-sm font-medium text-blue-800 hover:bg-blue-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-700 disabled:opacity-60'
 
-/** B2. Named after its action, so a screen reader user hears which one each button completes. */
+/**
+ * B2. Named after its action, so a screen reader user hears which one each button completes. The visible words
+ * come first in that name (WCAG 2.5.3), so a voice control user can say "click Mark complete".
+ */
 function CompleteActionButton({ ncrId, actionId, description }: CompleteActionButtonProps) {
   const complete = useNcrCommand(() => completeCorrectiveAction(ncrId, actionId))
 
@@ -20,7 +23,7 @@ function CompleteActionButton({ ncrId, actionId, description }: CompleteActionBu
     <>
       <button
         type="button"
-        aria-label={`Mark "${description}" complete`}
+        aria-label={`Mark complete: ${description}`}
         disabled={complete.isPending}
         onClick={() => complete.mutate(undefined)}
         className={secondaryButtonClass}

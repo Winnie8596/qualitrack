@@ -97,7 +97,7 @@ describe('Investigation on the NCR page', () => {
     })
     const { user } = renderApp(`/ncrs/${actionInProgress.id}`)
 
-    await user.click(await screen.findByRole('button', { name: 'Mark "Deburr the flange" complete' }))
+    await user.click(await screen.findByRole('button', { name: 'Mark complete: Deburr the flange' }))
     const actions = screen.getByRole('region', { name: 'Corrective actions' })
     expect(await within(actions).findByText(/completed/)).toBeInTheDocument()
     const add = screen.getByRole('form', { name: 'Add a corrective action' })
