@@ -20,8 +20,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
-    // The Playwright smoke test runs in a real browser against the real API (npm run e2e), not in jsdom
-    exclude: [...configDefaults.exclude, 'e2e/**'],
+    // The Playwright smoke tests and Lighthouse audits run in a real browser against the real API
+    // (npm run e2e, npm run lighthouse), not in jsdom
+    exclude: [...configDefaults.exclude, 'e2e/**', 'lighthouse/**'],
     // See src/test/setup.ts: a page test that types into several fields can take a few seconds under load
     testTimeout: 15_000,
   },
