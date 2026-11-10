@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 namespace QualiTrack.Api.IntegrationTests.Ncrs;
 
 /// <summary>C1 verify and C2 reject, and the whole lifecycle from raising to closing over HTTP.</summary>
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class VerificationEndpointsTests(QualiTrackApiFactory factory)
 {
     private readonly NcrApi _api = new(factory);

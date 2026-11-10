@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace QualiTrack.Api.IntegrationTests.Ncrs;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class NcrEndpointsTests(QualiTrackApiFactory api)
 {
     private readonly NcrApi _api = new(api);

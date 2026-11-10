@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 namespace QualiTrack.Api.IntegrationTests.Ncrs;
 
 /// <summary>B1 plan the fix, B2 add and complete corrective actions, B3 submit for verification.</summary>
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class InvestigationEndpointsTests(QualiTrackApiFactory factory)
 {
     private readonly NcrApi _api = new(factory);

@@ -37,7 +37,7 @@ public sealed class ListNcrsHandler(INcrRepository repository, IClock clock, ICu
     {
         if (query.Page < 1)
         {
-            return Error.Validation("Page must be 1 or more.");
+            return UseCaseError.Validation("Page must be 1 or more.");
         }
 
         var now = clock.UtcNow;

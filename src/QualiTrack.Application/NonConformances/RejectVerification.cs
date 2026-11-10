@@ -11,7 +11,7 @@ public sealed class RejectVerificationHandler(NcrCommandRunner runner, ICurrentU
         // The domain still checks the verifier is not the investigator (BR-5)
         if (currentUser.Role != Role.QaManager)
         {
-            return Task.FromResult<Result>(Error.Forbidden("Only a QA manager can reject a fix."));
+            return Task.FromResult<Result>(UseCaseError.Forbidden("Only a QA manager can reject a fix."));
         }
 
         return runner.RunAsync(

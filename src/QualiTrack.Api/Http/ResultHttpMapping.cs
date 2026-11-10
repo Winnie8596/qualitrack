@@ -16,7 +16,7 @@ public static class ResultHttpMapping
         result.IsSuccess ? onSuccess(result.Value) : Problem(result.Error);
 
     // The title is left to the framework, which names the status code ("Not Found") and links to its RFC section
-    private static ProblemHttpResult Problem(Error error) =>
+    private static ProblemHttpResult Problem(UseCaseError error) =>
         TypedResults.Problem(statusCode: StatusCodeOf(error.Kind), detail: error.Message);
 
     private static int StatusCodeOf(ErrorKind kind) => kind switch

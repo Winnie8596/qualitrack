@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace QualiTrack.Api.IntegrationTests.Http;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class ProblemResponseTests(QualiTrackApiFactory api)
 {
     [Theory]

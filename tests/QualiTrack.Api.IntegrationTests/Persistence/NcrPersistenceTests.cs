@@ -4,7 +4,7 @@ using QualiTrack.Domain.NonConformances;
 
 namespace QualiTrack.Api.IntegrationTests.Persistence;
 
-[Collection(PostgresCollection.Name)]
+[Collection(PostgresTestGroup.Name)]
 public sealed class NcrPersistenceTests(PostgresFixture database)
 {
     private static readonly DateTimeOffset _raisedAt = new(2026, 10, 1, 9, 0, 0, TimeSpan.Zero);

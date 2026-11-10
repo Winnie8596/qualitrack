@@ -6,7 +6,7 @@ using QualiTrack.Api.Http;
 
 namespace QualiTrack.Api.IntegrationTests.Http;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class AntiforgeryTests(QualiTrackApiFactory api)
 {
     [Fact]

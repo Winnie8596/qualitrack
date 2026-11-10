@@ -29,7 +29,7 @@ public sealed class NcrCommandRunner(INcrRepository repository, IUnitOfWork unit
         var ncr = await repository.GetByIdAsync(ncrId, cancellationToken);
         if (ncr is null)
         {
-            return Error.NotFound($"NCR {ncrId} was not found.");
+            return UseCaseError.NotFound($"NCR {ncrId} was not found.");
         }
 
         Result result;

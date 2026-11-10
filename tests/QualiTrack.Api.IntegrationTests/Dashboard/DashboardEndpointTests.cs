@@ -5,7 +5,7 @@ using QualiTrack.Api.IntegrationTests.Ncrs;
 
 namespace QualiTrack.Api.IntegrationTests.Dashboard;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class DashboardEndpointTests(QualiTrackApiFactory factory)
 {
     private readonly NcrApi _api = new(factory);

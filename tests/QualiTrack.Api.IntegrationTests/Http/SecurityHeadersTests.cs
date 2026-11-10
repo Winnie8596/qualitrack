@@ -8,7 +8,7 @@ using QualiTrack.Domain.NonConformances;
 
 namespace QualiTrack.Api.IntegrationTests.Http;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class SecurityHeadersTests(QualiTrackApiFactory api)
 {
     [Theory]

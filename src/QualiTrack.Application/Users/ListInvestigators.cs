@@ -11,7 +11,7 @@ public sealed class ListInvestigatorsHandler(IUserDirectory users, ICurrentUser 
     {
         if (currentUser.Role != Role.QaManager)
         {
-            return Error.Forbidden("Only a QA manager can list investigators.");
+            return UseCaseError.Forbidden("Only a QA manager can list investigators.");
         }
 
         var investigators = await users.ListAsync(Role.Investigator, cancellationToken);

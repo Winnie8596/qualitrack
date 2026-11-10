@@ -8,7 +8,7 @@ namespace QualiTrack.Api.IntegrationTests;
 
 /// <summary>
 /// The real API in Development, against its own empty PostgreSQL in Docker, shared by every test class in the
-/// <see cref="ApiCollection"/>. Separate from the persistence tests' database so startup sees a fresh one.
+/// <see cref="ApiTestGroup"/>. Separate from the persistence tests' database so startup sees a fresh one.
 /// </summary>
 public sealed class QualiTrackApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
@@ -46,7 +46,7 @@ public sealed class QualiTrackApiFactory : WebApplicationFactory<Program>, IAsyn
 }
 
 [CollectionDefinition(Name)]
-public sealed class ApiCollection : ICollectionFixture<QualiTrackApiFactory>
+public sealed class ApiTestGroup : ICollectionFixture<QualiTrackApiFactory>
 {
     public const string Name = "Api";
 }

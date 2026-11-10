@@ -11,7 +11,7 @@ public sealed class CompleteCorrectiveActionHandler(NcrCommandRunner runner, ICu
         // Any investigator may call; the domain checks it is the one assigned to this NCR (BR-3)
         if (currentUser.Role != Role.Investigator)
         {
-            return Task.FromResult<Result>(Error.Forbidden("Only an investigator can complete a corrective action."));
+            return Task.FromResult<Result>(UseCaseError.Forbidden("Only an investigator can complete a corrective action."));
         }
 
         return runner.RunAsync(

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 namespace QualiTrack.Api.IntegrationTests.Ncrs;
 
 /// <summary>A2 assign an investigator and A3 cancel, and the investigator list the assign form picks from.</summary>
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class TriageEndpointsTests(QualiTrackApiFactory factory)
 {
     private readonly NcrApi _api = new(factory);

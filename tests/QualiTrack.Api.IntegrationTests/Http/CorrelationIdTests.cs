@@ -6,7 +6,7 @@ using QualiTrack.Api.Http;
 
 namespace QualiTrack.Api.IntegrationTests.Http;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class CorrelationIdTests(QualiTrackApiFactory api)
 {
     private static readonly Uri _https = new("https://localhost");

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QualiTrack.Api.IntegrationTests.Persistence;
 
-[Collection(PostgresCollection.Name)]
+[Collection(PostgresTestGroup.Name)]
 public sealed class RoleSeedTests(PostgresFixture database)
 {
     [Fact]

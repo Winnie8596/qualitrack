@@ -8,7 +8,7 @@ namespace QualiTrack.Api.IntegrationTests.Http;
 /// The Docker image carries the built web app in the API's web root (plan.md Phase 6). Here a folder with a
 /// stand-in build plays that part: a page, and one script named by its content hash as Vite names them.
 /// </summary>
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class WebAppTests : IDisposable
 {
     private const string Page = "<!doctype html><title>QualiTrack</title>";

@@ -24,7 +24,7 @@ public sealed class AttachPhotoHandler(NcrCommandRunner runner, IFileStore files
     {
         if (currentUser.Role != Role.Inspector)
         {
-            return Task.FromResult<Result>(Error.Forbidden("Only an inspector can attach a photo."));
+            return Task.FromResult<Result>(UseCaseError.Forbidden("Only an inspector can attach a photo."));
         }
 
         return runner.RunAsync(
@@ -54,7 +54,7 @@ public sealed class GetNcrPhotoHandler(INcrRepository repository, IFileStore fil
         var ncr = await repository.GetByIdAsync(query.NcrId, cancellationToken);
         if (ncr is null || !currentUser.CanView(ncr) || ncr.Photo is not { } format)
         {
-            return Error.NotFound($"NCR {query.NcrId} has no photo.");
+            return UseCaseError.NotFound($"NCR {query.NcrId} has no photo.");
         }
 
         var content = await files.OpenReadAsync(NcrPhotoFile.KeyFor(ncr.Id, format), cancellationToken);

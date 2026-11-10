@@ -11,7 +11,7 @@ public sealed class AssignInvestigatorHandler(NcrCommandRunner runner, ICurrentU
     {
         if (currentUser.Role != Role.QaManager)
         {
-            return Task.FromResult<Result>(Error.Forbidden("Only a QA manager can assign an investigator."));
+            return Task.FromResult<Result>(UseCaseError.Forbidden("Only a QA manager can assign an investigator."));
         }
 
         return runner.RunAsync(
@@ -21,7 +21,7 @@ public sealed class AssignInvestigatorHandler(NcrCommandRunner runner, ICurrentU
                 var investigator = new UserId(command.InvestigatorId);
                 if (await users.FindRoleAsync(investigator, cancellationToken) != Role.Investigator)
                 {
-                    return Error.Validation($"User {command.InvestigatorId} is not an investigator.");
+                    return UseCaseError.Validation($"User {command.InvestigatorId} is not an investigator.");
                 }
 
                 ncr.AssignInvestigator(investigator, command.DueDate, stamp);

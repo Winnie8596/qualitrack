@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace QualiTrack.Api.IntegrationTests.Authentication;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class AuthEndpointsTests(QualiTrackApiFactory api)
 {
     [Theory]

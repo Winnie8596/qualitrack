@@ -30,7 +30,7 @@ indistinguishable.
   user may not do this to this NCR, BR-3/BR-5). A constructor or method either succeeds or leaves
   nothing changed.
 - **At the handler boundary, exceptions become results.** Handlers return `Result` / `Result<T>`
-  with an `Error` of kind `Validation`, `NotFound`, `Forbidden` or `Conflict`. They never throw for
+  with a `UseCaseError` of kind `Validation`, `NotFound`, `Forbidden` or `Conflict`. They never throw for
   an expected failure.
 - **One mapping, one place.** `DomainErrors.From` maps `InvalidInput` → `Validation`,
   `InvalidState` → `Conflict`, `NotPermitted` → `Forbidden`. `NcrCommandRunner` is the only place

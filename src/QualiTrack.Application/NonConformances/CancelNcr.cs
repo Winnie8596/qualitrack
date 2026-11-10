@@ -10,7 +10,7 @@ public sealed class CancelNcrHandler(NcrCommandRunner runner, ICurrentUser curre
     {
         if (currentUser.Role != Role.QaManager)
         {
-            return Task.FromResult<Result>(Error.Forbidden("Only a QA manager can cancel an NCR."));
+            return Task.FromResult<Result>(UseCaseError.Forbidden("Only a QA manager can cancel an NCR."));
         }
 
         return runner.RunAsync(command.NcrId, (ncr, stamp) => ncr.Cancel(command.Reason, stamp), cancellationToken);

@@ -14,7 +14,7 @@ public sealed class ResultHttpMappingTests
     [InlineData(ErrorKind.Conflict, StatusCodes.Status409Conflict)]
     public void Each_kind_of_failure_becomes_a_problem_with_its_status_code(ErrorKind kind, int statusCode)
     {
-        Result result = new Error(kind, "What went wrong.");
+        Result result = new UseCaseError(kind, "What went wrong.");
 
         var problem = Assert.IsType<ProblemHttpResult>(result.ToHttpResult());
 
@@ -27,7 +27,7 @@ public sealed class ResultHttpMappingTests
     [Fact]
     public void A_failure_with_a_value_type_becomes_the_same_problem()
     {
-        Result<Guid> result = Error.NotFound("No such NCR.");
+        Result<Guid> result = UseCaseError.NotFound("No such NCR.");
 
         var problem = Assert.IsType<ProblemHttpResult>(result.ToHttpResult(Results.Ok));
 

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace QualiTrack.Api.IntegrationTests;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class StartupMigrationTests(QualiTrackApiFactory api)
 {
     [Fact]

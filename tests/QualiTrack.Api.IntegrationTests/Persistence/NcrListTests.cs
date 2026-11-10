@@ -12,7 +12,7 @@ namespace QualiTrack.Api.IntegrationTests.Persistence;
 /// The NCR list against real PostgreSQL: every filter must translate to SQL, and the sort order is the
 /// database's. Each test lists as its own investigator, so NCRs other tests saved stay out of its results.
 /// </summary>
-[Collection(PostgresCollection.Name)]
+[Collection(PostgresTestGroup.Name)]
 public sealed class NcrListTests(PostgresFixture database)
 {
     private static readonly DateTimeOffset _raisedAt = new(2026, 10, 1, 9, 0, 0, TimeSpan.Zero);

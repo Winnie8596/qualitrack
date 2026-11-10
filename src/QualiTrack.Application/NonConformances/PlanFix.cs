@@ -11,7 +11,7 @@ public sealed class PlanFixHandler(NcrCommandRunner runner, ICurrentUser current
         // Any investigator may call; the domain checks it is the one assigned to this NCR (BR-3)
         if (currentUser.Role != Role.Investigator)
         {
-            return Task.FromResult<Result>(Error.Forbidden("Only an investigator can plan a fix."));
+            return Task.FromResult<Result>(UseCaseError.Forbidden("Only an investigator can plan a fix."));
         }
 
         return runner.RunAsync(

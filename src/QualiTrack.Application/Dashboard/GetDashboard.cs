@@ -23,7 +23,7 @@ public sealed class GetDashboardHandler(IDashboardReader reader, IClock clock, I
     {
         if (currentUser.Role != Role.QaManager)
         {
-            return Error.Forbidden("Only a QA manager can see the dashboard.");
+            return UseCaseError.Forbidden("Only a QA manager can see the dashboard.");
         }
 
         var now = clock.UtcNow;

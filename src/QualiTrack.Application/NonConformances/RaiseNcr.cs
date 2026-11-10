@@ -17,7 +17,7 @@ public sealed class RaiseNcrHandler(
     {
         if (currentUser.Role != Role.Inspector)
         {
-            return Error.Forbidden("Only an inspector can raise an NCR.");
+            return UseCaseError.Forbidden("Only an inspector can raise an NCR.");
         }
 
         // Built before taking a number so a rejected NCR does not use up a sequence value

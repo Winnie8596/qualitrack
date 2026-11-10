@@ -14,7 +14,7 @@ public sealed class ResultTests
     [Fact]
     public void A_failed_result_carries_its_error()
     {
-        var error = Error.Conflict("NCR is already closed.");
+        var error = UseCaseError.Conflict("NCR is already closed.");
 
         Result result = error;
 
@@ -34,7 +34,7 @@ public sealed class ResultTests
     [Fact]
     public void The_value_of_a_failed_result_cannot_be_read()
     {
-        Result<int> result = Error.NotFound("NCR not found.");
+        Result<int> result = UseCaseError.NotFound("NCR not found.");
 
         Assert.False(result.IsSuccess);
         Assert.Equal(ErrorKind.NotFound, result.Error.Kind);
@@ -50,10 +50,10 @@ public sealed class ResultTests
     {
         var error = kind switch
         {
-            ErrorKind.Validation => Error.Validation("message"),
-            ErrorKind.NotFound => Error.NotFound("message"),
-            ErrorKind.Forbidden => Error.Forbidden("message"),
-            ErrorKind.Conflict => Error.Conflict("message"),
+            ErrorKind.Validation => UseCaseError.Validation("message"),
+            ErrorKind.NotFound => UseCaseError.NotFound("message"),
+            ErrorKind.Forbidden => UseCaseError.Forbidden("message"),
+            ErrorKind.Conflict => UseCaseError.Conflict("message"),
             _ => throw new ArgumentOutOfRangeException(nameof(kind)),
         };
 

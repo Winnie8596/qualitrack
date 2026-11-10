@@ -6,7 +6,7 @@ using QualiTrack.Api.Authentication;
 
 namespace QualiTrack.Api.IntegrationTests.Authentication;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class PoliciesTests(QualiTrackApiFactory api)
 {
     [Theory]

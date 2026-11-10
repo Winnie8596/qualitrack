@@ -6,7 +6,7 @@ using QualiTrack.Application.Abstractions;
 
 namespace QualiTrack.Api.IntegrationTests.Authentication;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class HttpCurrentUserTests(QualiTrackApiFactory api)
 {
     [Theory]

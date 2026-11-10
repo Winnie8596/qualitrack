@@ -4,7 +4,7 @@ using QualiTrack.Api.IntegrationTests.Ncrs;
 
 namespace QualiTrack.Api.IntegrationTests.Authentication;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class SessionKeysTests(QualiTrackApiFactory api) : IDisposable
 {
     private readonly string _keys = Path.Combine(Path.GetTempPath(), $"qualitrack-keys-{Guid.NewGuid():N}");

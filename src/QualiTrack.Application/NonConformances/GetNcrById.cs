@@ -41,7 +41,7 @@ public sealed class GetNcrByIdHandler(INcrRepository repository, IClock clock, I
         // An NCR the caller may not see gets the same answer as one that does not exist, so ids cannot be probed
         if (ncr is null || !currentUser.CanView(ncr))
         {
-            return Error.NotFound($"NCR {query.Id} was not found.");
+            return UseCaseError.NotFound($"NCR {query.Id} was not found.");
         }
 
         return ToView(ncr, clock.UtcNow);

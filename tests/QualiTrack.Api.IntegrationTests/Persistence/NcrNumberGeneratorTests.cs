@@ -4,7 +4,7 @@ using QualiTrack.Infrastructure.Persistence;
 namespace QualiTrack.Api.IntegrationTests.Persistence;
 
 // The database is shared with other persistence tests, so each test uses a year of its own
-[Collection(PostgresCollection.Name)]
+[Collection(PostgresTestGroup.Name)]
 public sealed class NcrNumberGeneratorTests(PostgresFixture database)
 {
     [Fact]

@@ -11,7 +11,7 @@ public sealed class SubmitForVerificationHandler(NcrCommandRunner runner, ICurre
         // Any investigator may call; the domain checks it is the one assigned to this NCR (BR-3)
         if (currentUser.Role != Role.Investigator)
         {
-            return Task.FromResult<Result>(Error.Forbidden("Only an investigator can submit for verification."));
+            return Task.FromResult<Result>(UseCaseError.Forbidden("Only an investigator can submit for verification."));
         }
 
         return runner.RunAsync(command.NcrId, (ncr, stamp) => ncr.SubmitForVerification(stamp), cancellationToken);

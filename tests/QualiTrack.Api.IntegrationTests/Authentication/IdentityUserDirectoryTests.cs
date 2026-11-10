@@ -5,7 +5,7 @@ using QualiTrack.Domain;
 
 namespace QualiTrack.Api.IntegrationTests.Authentication;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class IdentityUserDirectoryTests(QualiTrackApiFactory api)
 {
     [Theory]

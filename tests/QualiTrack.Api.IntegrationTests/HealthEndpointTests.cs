@@ -2,7 +2,7 @@ using System.Net;
 
 namespace QualiTrack.Api.IntegrationTests;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class HealthEndpointTests(QualiTrackApiFactory api)
 {
     [Fact]

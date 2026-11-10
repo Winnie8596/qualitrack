@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 
 namespace QualiTrack.Api.IntegrationTests.Authentication;
 
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class AuthenticationCookieTests(QualiTrackApiFactory api)
 {
     [Fact]

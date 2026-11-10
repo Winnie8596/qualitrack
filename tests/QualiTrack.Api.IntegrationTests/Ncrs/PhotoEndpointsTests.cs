@@ -7,7 +7,7 @@ using QualiTrack.Api.Http;
 namespace QualiTrack.Api.IntegrationTests.Ncrs;
 
 /// <summary>A1 attach one optional photo, D2 show it.</summary>
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class PhotoEndpointsTests(QualiTrackApiFactory factory)
 {
     private const int FiveMegabytes = 5 * 1024 * 1024;

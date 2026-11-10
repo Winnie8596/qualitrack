@@ -8,7 +8,7 @@ namespace QualiTrack.Api.IntegrationTests.Persistence;
 
 /// <summary>
 /// A real PostgreSQL in Docker (same major version as docker-compose), started once and shared by every test
-/// class in the <see cref="PostgresCollection"/>. Tests share the database, so each uses its own NCR number.
+/// class in the <see cref="PostgresTestGroup"/>. Tests share the database, so each uses its own NCR number.
 /// </summary>
 public sealed class PostgresFixture : IAsyncLifetime
 {
@@ -34,7 +34,7 @@ public sealed class PostgresFixture : IAsyncLifetime
 }
 
 [CollectionDefinition(Name)]
-public sealed class PostgresCollection : ICollectionFixture<PostgresFixture>
+public sealed class PostgresTestGroup : ICollectionFixture<PostgresFixture>
 {
     public const string Name = "Postgres";
 }

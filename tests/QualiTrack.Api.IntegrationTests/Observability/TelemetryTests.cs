@@ -15,7 +15,7 @@ namespace QualiTrack.Api.IntegrationTests.Observability;
 /// see exactly the spans and measurements a real collector would receive. The server ends a request's span and
 /// records its duration just after the client has its response, so each test waits for what it expects.
 /// </summary>
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class TelemetryTests(QualiTrackApiFactory api)
 {
     private static readonly TimeSpan _patience = TimeSpan.FromSeconds(10);

@@ -11,9 +11,9 @@ public sealed class QualiTrackDbContext(DbContextOptions<QualiTrackDbContext> op
 {
     public DbSet<NonConformance> NonConformances => Set<NonConformance>();
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.ApplyConfigurationsFromAssembly(typeof(QualiTrackDbContext).Assembly);
+        base.OnModelCreating(builder);
+        builder.ApplyConfigurationsFromAssembly(typeof(QualiTrackDbContext).Assembly);
     }
 }

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 namespace QualiTrack.Api.IntegrationTests;
 
 /// <summary>Phase 4's "Done when": the OpenAPI document (served in Development) lists every endpoint.</summary>
-[Collection(ApiCollection.Name)]
+[Collection(ApiTestGroup.Name)]
 public sealed class OpenApiTests(QualiTrackApiFactory api)
 {
     public static TheoryData<string, string> Endpoints => new()
