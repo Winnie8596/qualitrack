@@ -6,6 +6,9 @@
 # dotenv files
 .env
 
+# NCR photos stored by the API in development (FileStore:Root)
+App_Data/
+
 # User-specific files
 *.rsuser
 *.suo

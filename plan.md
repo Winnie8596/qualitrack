@@ -9,7 +9,7 @@
 
 ### Working agreement
 
-1. **One task at a time.** Pick the next unchecked task in the current phase, do it, verify it, tick it (`- [x]`), then stop and summarise.
+1. **One phase at a time.** Work through the current phase's tasks in order: do each one, verify it, tick it (`- [x]`), commit, and go straight on to the next. Stop and summarise when the phase's "Done when" holds (or when rule 5 applies). Slices still get one branch and PR each, stacked on each other (agreed with owner).
 2. **Tests first.** For any behaviour: write the failing test, show it fails, implement the minimum to pass, refactor. Never write production code for a rule without a test.
 3. **Small diffs.** One task = one commit using Conventional Commits (`feat(domain): ...`, `test(api): ...`, `refactor: ...`, `ci: ...`, `docs: ...`).
 4. **Explain.** After each task, write 3–5 lines: what changed, why, which principle it applies, anything the owner should learn or check. The owner must be able to defend this code in an interview.
@@ -38,7 +38,7 @@ src/QualiTrack.Api             → references Application + Infrastructure (comp
 - Business rules live **only** in Domain entities/value objects. Application orchestrates; it does not decide.
 - `NonConformance.Status` has a private setter. Status changes only via entity methods.
 - Domain never calls `DateTime.Now`, `DateTimeOffset.UtcNow`, or reads users from context. Time and user are passed in (`AuditStamp`).
-- Infrastructure implements interfaces declared in Application (`INcrRepository`, `IUnitOfWork`, `IClock`, `ICurrentUser`, `IFileStore`, `INcrNumberGenerator`).
+- Infrastructure implements interfaces declared in Application (`INcrRepository`, `IUnitOfWork`, `IClock`, `ICurrentUser`, `IFileStore`, `INcrNumberGenerator`, `IUserDirectory`).
 - Api endpoints are thin: map request → command/query → handler → map result to HTTP.
 
 ### Clean code checklist (every diff)
@@ -68,21 +68,21 @@ Source: roadmap.sh/full-stack (2026). The roadmap's reference stack is Node.js +
 
 | Roadmap topic | QualiTrack equivalent | Phase | Explain it (owner, in an interview) |
 | --- | --- | --- | --- |
-| How the web works: HTTP, DNS, browsers | API requests, cookies, CORS, deployment domain | 0, 4, 8 | What happens from typing the URL to seeing the NCR list; status codes; headers; HTTPS |
-| HTML | Semantic markup for forms, tables, nav | 5 | Why `<button>` not `<div onClick>`; labels; landmarks |
-| CSS | Layout with Flexbox/Grid, responsive pages | 5 | Box model, specificity, mobile-first, media queries |
-| Tailwind CSS | Utility-first styling for the web app | 5 | Trade-offs vs plain CSS / component libraries |
-| JavaScript | Async/await, fetch, modules, closures in React code | 0, 5 | Event loop, promises, `this`, equality, array methods |
-| TypeScript | Strict typed web app and API types | 0, 5 | Union types, generics, narrowing, why no `any` |
-| npm | `web/` dependencies, scripts, lockfile | 0, 5 | `npm ci` vs `npm install`, semver, lockfiles |
+| How the web works: HTTP, DNS, browsers | API requests, cookies, CORS, deployment domain | 0, 3, 8 | What happens from typing the URL to seeing the NCR list; status codes; headers; HTTPS |
+| HTML | Semantic markup for forms, tables, nav | 3–5 | Why `<button>` not `<div onClick>`; labels; landmarks |
+| CSS | Layout with Flexbox/Grid, responsive pages | 3–5 | Box model, specificity, mobile-first, media queries |
+| Tailwind CSS | Utility-first styling for the web app | 3 | Trade-offs vs plain CSS / component libraries |
+| JavaScript | Async/await, fetch, modules, closures in React code | 0, 3, 4 | Event loop, promises, `this`, equality, array methods |
+| TypeScript | Strict typed web app and API types | 0, 3, 4 | Union types, generics, narrowing, why no `any` |
+| npm | `web/` dependencies, scripts, lockfile | 0, 3 | `npm ci` vs `npm install`, semver, lockfiles |
 | Git | Small commits, branches, rebase, `.gitattributes` | all | Merge vs rebase, resolving conflicts, reverting a bad commit |
 | GitHub | PRs, issues, protected `main`, Actions | all | Pull request workflow and code review etiquette |
-| React | Components, hooks, routing, forms, server state | 5 | State vs props, effects, re-renders, keys, controlled inputs |
+| React | Components, hooks, routing, forms, server state | 3, 4 | State vs props, effects, re-renders, keys, controlled inputs |
 | Node.js (backend) | ASP.NET Core Web API (same role) | 2–4 | Request pipeline, middleware, dependency injection |
-| RESTful APIs | `/api/ncrs` resources, ProblemDetails, paging | 4 | Resource naming, verbs, idempotency, status codes, pagination |
-| Authentication (JWT) | Cookie auth chosen; JWT compared in ADR 0006 | 4 | Session cookie vs JWT, CSRF, XSS, where tokens live |
-| PostgreSQL / SQL | EF Core + migrations + indexes | 3 | Joins, indexes, `EXPLAIN ANALYZE`, transactions, N+1 queries |
-| Redis | Cache dashboard numbers via `IDistributedCache` | 6 | Cache-aside, TTL, invalidation, when not to cache |
+| RESTful APIs | `/api/ncrs` resources, ProblemDetails, paging | 3, 4 | Resource naming, verbs, idempotency, status codes, pagination |
+| Authentication (JWT) | Cookie auth chosen; JWT compared in ADR 0006 | 3 | Session cookie vs JWT, CSRF, XSS, where tokens live |
+| PostgreSQL / SQL | EF Core + migrations + indexes | 3, 4 | Joins, indexes, `EXPLAIN ANALYZE`, transactions, N+1 queries |
+| Redis | Cache dashboard numbers via `IDistributedCache` | 4 | Cache-aside, TTL, invalidation, when not to cache |
 | Linux basics | CI runners, Docker images, container shell | 0, 6, 8 | Files, permissions, processes, env vars, logs, SSH |
 | Docker | Dockerfile, compose, Testcontainers | 0, 3, 6 | Image vs container, layers, volumes, networks, multi-stage builds |
 | GitHub Actions (CI/CD) | Build, test, coverage, deploy workflows | 0, 7, 8 | Pipelines, caching, secrets, deploy on tag |
@@ -108,9 +108,9 @@ Goal: browser → API → CI, end to end, with no features.
 - [x] `web/`: Vite React TS app showing "API status: healthy | unreachable" from `/health` via dev proxy
 - [x] `docker-compose.yml` with PostgreSQL 17 (named volume, credentials from `.env`, `.env.example` committed)
 - [x] `.github/workflows/ci.yml`: jobs `api` (restore, build, test) and `web` (npm ci, lint, build)
-- [ ] `docs/adr/0001-use-clean-architecture.md`, `docs/devlog.md`, minimal `README.md`
+- [x] `docs/adr/0001-use-clean-architecture.md`, `docs/devlog.md`, minimal `README.md`
 - [x] `.gitattributes` (LF endings, binary images)
-- [ ] Branch protection on `main` requiring green CI; PR template with the clean code checklist
+- [x] Branch protection on `main` requiring green CI; PR template with the clean code checklist
 - [ ] `docs/learning/http-basics.md`: owner's own notes on one request traced in browser DevTools (Network tab: method, status, headers, timing)
 
 ```
@@ -131,24 +131,24 @@ qualitrack/
 
 Goal: BR-1 … BR-9 enforced and unit-tested in `QualiTrack.Domain`. No packages.
 
-- [ ] Value objects: `DomainException`, `Severity`, `NcrStatus`, `UserId` (record struct), `AuditStamp(UserId By, DateTimeOffset At)`, `NcrNumber.From(year, sequence)`, `NcrDetails(title, description, location, severity)` with validation
-- [ ] `CorrectiveAction` (internal `Complete`), `StatusChange(From, To, Stamp, Note)`
-- [ ] `NonConformance` aggregate: `Raise`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteAction`, `SubmitForVerification`, `Verify`, `RejectVerification`, `Cancel`, `IsOverdue(now)`, `IsFinished`
-- [ ] Test helper `Ncrs` that builds an NCR in each state
-- [ ] Tests (one cycle each, commit after each):
-  - [ ] `A_new_ncr_starts_open`
-  - [ ] `Title_is_required` (theory: `""`, `"   "`) and same for description, location
-  - [ ] `Ncr_number_is_padded_to_four_digits`
-  - [ ] `Critical_ncr_cannot_be_due_more_than_7_days_after_it_was_raised` / `Critical_ncr_can_be_due_on_day_7`
-  - [ ] `Due_date_must_be_in_the_future`
-  - [ ] `Only_the_assigned_investigator_can_plan_the_fix`
-  - [ ] `Cannot_submit_while_a_corrective_action_is_incomplete`
-  - [ ] `Investigator_cannot_verify_their_own_fix` / `Another_user_verifying_closes_the_ncr`
-  - [ ] `Rejected_verification_returns_ncr_to_action_in_progress_with_reason`
-  - [ ] `A_closed_ncr_cannot_be_cancelled` and `A_cancelled_ncr_cannot_be_assigned`
-  - [ ] `Each_status_change_is_recorded_with_who_and_when`
-  - [ ] `Ncr_is_overdue_after_its_due_date_unless_finished` (theory)
-  - [ ] `A_failed_command_leaves_the_ncr_unchanged`
+- [x] Value objects: `DomainException`, `Severity`, `NcrStatus`, `UserId` (record struct), `AuditStamp(UserId By, DateTimeOffset At)`, `NcrNumber.From(year, sequence)`, `NcrDetails(title, description, location, severity)` with validation
+- [x] `CorrectiveAction` (internal `Complete`), `StatusChange(From, To, Stamp, Note)`
+- [x] `NonConformance` aggregate: `Raise`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteAction`, `SubmitForVerification`, `Verify`, `RejectVerification`, `Cancel`, `IsOverdue(now)`, `IsFinished`
+- [x] Test helper `Ncrs` that builds an NCR in each state
+- [x] Tests (one cycle each, commit after each):
+  - [x] `A_new_ncr_starts_open`
+  - [x] `Title_is_required` (theory: `""`, `"   "`) and same for description, location
+  - [x] `Ncr_number_is_padded_to_four_digits`
+  - [x] `Critical_ncr_cannot_be_due_more_than_7_days_after_it_was_raised` / `Critical_ncr_can_be_due_on_day_7`
+  - [x] `Due_date_must_be_in_the_future`
+  - [x] `Only_the_assigned_investigator_can_plan_the_fix`
+  - [x] `Cannot_submit_while_a_corrective_action_is_incomplete`
+  - [x] `Investigator_cannot_verify_their_own_fix` / `Another_user_verifying_closes_the_ncr`
+  - [x] `Rejected_verification_returns_ncr_to_action_in_progress_with_reason`
+  - [x] `A_closed_ncr_cannot_be_cancelled` and `A_cancelled_ncr_cannot_be_assigned`
+  - [x] `Each_status_change_is_recorded_with_who_and_when`
+  - [x] `Ncr_is_overdue_after_its_due_date_unless_finished` (theory)
+  - [x] `A_failed_command_leaves_the_ncr_unchanged`
 
 **Done when:** all tests pass in < 5 s; Domain `.csproj` has no `PackageReference` or `ProjectReference`.
 
@@ -158,67 +158,97 @@ Goal: BR-1 … BR-9 enforced and unit-tested in `QualiTrack.Domain`. No packages
 
 Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.Extensions.*` abstractions.
 
-- [ ] `Result` / `Result<T>` with error kinds: `Validation`, `NotFound`, `Forbidden`, `Conflict`
-- [ ] Interfaces: `INcrRepository`, `IUnitOfWork`, `IClock`, `ICurrentUser` (Id + Role), `INcrNumberGenerator`, `IFileStore`
-- [ ] Commands + handlers (one file each): `RaiseNcr`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteCorrectiveAction`, `SubmitForVerification`, `VerifyNcr`, `RejectVerification`, `CancelNcr`
-- [ ] Queries + handlers: `GetNcrById`, `ListNcrs` (filters, sort, paging, role visibility per PRD D1), `GetDashboard`
-- [ ] Role checks in handlers (who may call) — domain still enforces BR-3/BR-5 (who may act on *this* NCR)
-- [ ] Map `DomainException` → `Result` `Conflict` at the handler boundary only
-- [ ] Unit tests with hand-written in-memory fakes (no mocking library) for every handler: success, not found, forbidden, conflict
-- [ ] `docs/adr/0002-business-rules-live-in-the-domain.md`, `0005-exceptions-inside-results-at-the-boundary.md`
+- [x] `Result` / `Result<T>` with error kinds: `Validation`, `NotFound`, `Forbidden`, `Conflict`
+- [x] Interfaces: `INcrRepository`, `IUnitOfWork`, `IClock`, `ICurrentUser` (Id + Role), `INcrNumberGenerator`, `IFileStore`, `IUserDirectory` (role of another user, for A2; added with owner's agreement)
+- [x] Commands + handlers (one file each): `RaiseNcr`, `AssignInvestigator`, `PlanFix`, `AddCorrectiveAction`, `CompleteCorrectiveAction`, `SubmitForVerification`, `VerifyNcr`, `RejectVerification`, `CancelNcr`
+- [x] Role checks in handlers (who may call) — domain still enforces BR-3/BR-5 (who may act on *this* NCR)
+- [x] Map `DomainException` → `Result` at the handler boundary only, via `DomainErrors.From` (agreed with owner: the domain tags each broken rule; `InvalidInput` → `Validation`, `InvalidState` → `Conflict`, `NotPermitted` → `Forbidden`, so A1/A2 get field errors and BR-3/BR-5 give 403)
+- [x] Unit tests with hand-written in-memory fakes (no mocking library) for every command handler: success, not found, forbidden, conflict
+- [x] `docs/adr/0002-business-rules-live-in-the-domain.md`, `0005-exceptions-inside-results-at-the-boundary.md`
 
-**Done when:** every handler has success + failure tests; Application references only Domain and `Microsoft.Extensions.DependencyInjection.Abstractions`.
+Queries (`GetNcrById`, `ListNcrs`, `GetDashboard`) moved to the slices that first need them, so their shape follows the page that uses them.
 
----
-
-## Phase 3 — Persistence
-
-- [ ] `QualiTrackDbContext` with EF Core + Npgsql; configurations in separate `IEntityTypeConfiguration<T>` classes
-- [ ] Map value objects (`UserId`, `NcrNumber`, `NcrDetails`) via conversions/owned types; private backing fields for actions and history; add private parameterless constructors only where EF requires them
-- [ ] Unique index on NCR number; indexes on `Status`, `DueDate`, `InvestigatorId`, `RaisedBy`
-- [ ] `NcrNumberGenerator` safe under concurrency (per-year sequence table updated in a transaction)
-- [ ] `NcrRepository`, `UnitOfWork`, `SystemClock`, `LocalFileStore`
-- [ ] Initial migration; apply automatically in Development only
-- [ ] Integration tests with Testcontainers PostgreSQL: save/load round-trip preserves actions and history; two concurrent raises get different numbers
-- [ ] `docs/adr/0004-testcontainers-over-in-memory-database.md`
-- [ ] Run `EXPLAIN ANALYZE` on the NCR list query with 10,000 seeded rows before and after indexes; record results in `docs/learning/sql-indexes.md`
-- [ ] Integration test proving the list query issues a single SQL query (no N+1)
-
-**Done when:** persistence tests pass in CI (Docker available on `ubuntu-latest`).
+**Done when:** every command handler has success + failure tests; Application references only Domain and `Microsoft.Extensions.DependencyInjection.Abstractions`.
 
 ---
 
-## Phase 4 — API and authentication
+## How Phases 3–5 work (vertical slices, agreed with owner)
 
-- [ ] ASP.NET Core Identity on PostgreSQL; cookie auth (`HttpOnly`, `Secure`, `SameSite=Strict`); return `401/403` instead of redirects for `/api/*`
-- [ ] Seed three roles and one demo user per role (Development only; passwords from config)
-- [ ] `ICurrentUser` implementation from `HttpContext`
-- [ ] Endpoints per Conventions, grouped with `MapGroup`, each with `.RequireAuthorization(policy)`
-- [ ] Request DTOs validated; responses are DTOs, never entities
-- [ ] Global ProblemDetails + `Result` → HTTP mapping in one place
-- [ ] Correlation ID middleware + structured request logging
-- [ ] Integration tests per endpoint: happy path, 400, 401, 403, 404, 409; full lifecycle test Open → Closed via HTTP
-- [ ] `docs/adr/0006-cookie-auth-over-jwt.md`
-- [ ] Antiforgery (CSRF) protection for cookie-authenticated state-changing endpoints; test that a request without the token is rejected
-- [ ] Security headers (CSP, `X-Content-Type-Options`, `Referrer-Policy`); rate limiting on `/api/auth/login`
-- [ ] `docs/learning/owasp-top-10.md`: each OWASP Top 10 item, and where QualiTrack defends against it (or why it doesn't apply)
-- [ ] ADR 0006 must compare cookie sessions with JWT (storage, CSRF/XSS exposure, revocation)
+From here, features are built as **vertical slices**: one user-visible feature at a time, through every layer (handler → persistence → endpoint → page), before the next starts. There is no separate foundations phase: each slice builds the shared pieces it is the first to need, and later slices reuse them. Each slice is one PR (or a short stack of PRs).
 
-**Done when:** full lifecycle integration test passes; OpenAPI document lists every endpoint; writes without an antiforgery token are rejected; security headers are present on every response; login is rate-limited.
+**A slice is done when:**
+
+- its query/handler, persistence, endpoint and page each have tests (unit, Testcontainers, HTTP integration, component)
+- endpoint tests cover happy path, 400, 401, 403, 404 and 409 where they apply
+- it works in the browser for the roles allowed, and its controls are hidden from the roles that are not
+- its pages pass the accessibility rules (labelled inputs, keyboard use, text + colour for status and severity)
+- the ADR or learning note it introduces is written
 
 ---
 
-## Phase 5 — Frontend
+## Phase 3 — Slice S1: raise and view an NCR (A1, D2 without photo, E1)
 
-- [ ] Routing, auth context from `/api/auth/me`, protected routes per role
-- [ ] Typed API client (`web/src/api/`) using `fetch` + TanStack Query; ProblemDetails surfaced as form/field errors
-- [ ] Pages: Login · NCR list (filters, sort, paging, overdue badge) · NCR detail (actions shown only when allowed, history timeline) · Raise NCR form (React Hook Form + Zod, photo upload) · Dashboard
-- [ ] Status and severity shown with text + colour (never colour only)
-- [ ] Component tests for the raise form and status badge (Vitest + Testing Library)
-- [ ] One Playwright smoke test: login as each role and run the lifecycle
-- [ ] Tailwind CSS for styling (ADR 0007 records the choice); responsive layout tested at 375 px and 1280 px
-- [ ] Semantic HTML and accessibility: every input labelled, keyboard-only lifecycle run, axe/Lighthouse accessibility score ≥ 90
-- [ ] Lighthouse performance score ≥ 90 on the NCR list page; route-level code splitting
+Goal: an Inspector logs in, raises an NCR and sees it on its detail page. S1 is the first slice, so it also builds the shared pieces every later slice reuses.
+
+### Persistence
+
+- [x] `QualiTrackDbContext` with EF Core + Npgsql; configurations in separate `IEntityTypeConfiguration<T>` classes
+- [x] Map the `NonConformance` aggregate: value objects (`UserId`, `NcrNumber`, `NcrDetails`) via conversions/owned types; private backing fields for actions and history; private parameterless constructors only where EF requires them; unique index on NCR number (agreed with owner: actions and history as JSON columns via EF complex collections, so they load with the NCR and keep their order)
+- [x] `NcrRepository`, `UnitOfWork`, `SystemClock`
+- [x] `NcrNumberGenerator` safe under concurrency (per-year sequence table updated in a transaction)
+- [x] Initial migration; apply automatically in Development only
+- [x] Testcontainers PostgreSQL: save/load round-trip preserves actions and history; two concurrent raises get different numbers
+- [x] `docs/adr/0004-testcontainers-over-in-memory-database.md`
+
+### Authentication
+
+- [x] ASP.NET Core Identity on PostgreSQL; cookie auth (`HttpOnly`, `Secure`, `SameSite=Strict`); return `401/403` instead of redirects for `/api/*`
+- [x] Seed three roles and one demo user per role (Development only; passwords from config)
+- [x] `ICurrentUser` from `HttpContext`; `IUserDirectory` over Identity
+- [x] `/api/auth/login`, `/api/auth/logout`, `/api/auth/me` with integration tests (incl. 401); rate limiting on login
+- [x] `docs/adr/0006-cookie-auth-over-jwt.md`, comparing cookie sessions with JWT (storage, CSRF/XSS exposure, revocation)
+
+### API
+
+- [x] `Result` → ProblemDetails mapping in one place; endpoints grouped with `MapGroup`, each with `.RequireAuthorization(policy)`
+- [x] `GetNcrById` query (response DTO, never the entity)
+- [x] `POST /api/ncrs`, `GET /api/ncrs/{id}`; request DTOs validated; integration tests: 201, 400, 401, 403, 404
+- [x] Antiforgery (CSRF) for cookie-authenticated writes; test that a write without the token is rejected
+- [x] Security headers (CSP, `X-Content-Type-Options`, `Referrer-Policy`) on every response
+
+### Web
+
+- [x] Tailwind CSS (ADR 0007 records the choice); app layout with semantic landmarks
+- [x] Routing, auth context from `/api/auth/me`, protected routes per role (React Router, ADR 0008)
+- [x] Typed API client (`web/src/api/`) using `fetch` + TanStack Query; ProblemDetails surfaced as form/field errors (responses checked with Zod; `toFormErrors` is wired into the forms with the form task)
+- [x] Login page; Raise NCR form (React Hook Form + Zod); NCR detail page with status badge
+- [x] Component tests for the login form, raise form and status badge (Vitest + Testing Library)
+
+**Done when:** the slice definition of done holds; an Inspector can log in, raise an NCR and see it in the browser; unauthenticated calls get 401; writes without an antiforgery token are rejected; security headers are on every response; Testcontainers tests pass in CI (Docker on `ubuntu-latest`).
+
+---
+
+## Phase 4 — Slices S2–S7
+
+Goal: each slice leaves one more user story working end to end. Do them in order.
+
+- [x] **S2 — NCR list** (D1): `ListNcrs` (filters, sort, paging, role visibility); indexes on `Status`, `DueDate`, `InvestigatorId`, `RaisedBy`; `EXPLAIN ANALYZE` with 10,000 seeded rows before and after indexes in `docs/learning/sql-indexes.md`; test that the list issues a single SQL query (no N+1); list page with filters, sort, paging, overdue badge; correlation ID middleware + structured request logging
+- [x] **S3 — Triage** (A2, A3): `/assign`, `/cancel`; assign and cancel controls on the detail page for QA managers (also `GET /api/users/investigators` for the assign form's picker)
+- [x] **S4 — Investigator work** (B1–B3): `/plan-fix`, `/actions`, `/actions/{actionId}/complete`, `/submit`; plan-fix form, action list, history timeline
+- [x] **S5 — Verification** (C1, C2): `/verify`, `/reject`; HTTP integration test for the full lifecycle Open → Closed; Playwright smoke test: log in as each role and run the lifecycle
+- [x] **S6 — Dashboard** (D3): `GetDashboard` tested with seeded data; `/api/dashboard`; Redis in `docker-compose.yml` with `IDistributedCache` (cache-aside, 60 s TTL, invalidated when an NCR changes status, falls back to the database if Redis is down); dashboard page
+- [x] **S7 — Photo** (A1, D2): `LocalFileStore`; JPEG/PNG only, max 5 MB; upload on the raise form, shown on the detail page
+
+**Done when:** every slice meets the slice definition of done; OpenAPI lists every endpoint; the full lifecycle passes over HTTP and in Playwright.
+
+---
+
+## Phase 5 — Whole-app quality in the browser
+
+- [x] Keyboard-only run of the whole lifecycle; axe/Lighthouse accessibility ≥ 90 on every page (`e2e/keyboard.spec.ts` and `e2e/accessibility.spec.ts`: no WCAG 2.2 A/AA violations from axe on any page; `npm run lighthouse`: accessibility 100 on every page)
+- [x] Lighthouse performance ≥ 90 on the NCR list page; route-level code splitting (91–98 across runs under Lighthouse's mobile profile, on the production build; it varies with machine load)
+- [x] Responsive layout checked at 375 px and 1280 px on every page (`e2e/responsive.spec.ts`: no sideways scroll, screenshots in `test-results/`)
+- [x] `docs/learning/owasp-top-10.md`: each OWASP Top 10 item, and where QualiTrack defends against it (or why it doesn't apply)
 
 **Done when:** a reviewer can run the whole lifecycle in the browser with the three demo users; Lighthouse performance and accessibility are ≥ 90 on the NCR list page; layout works at 375 px.
 
@@ -226,13 +256,11 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 
 ## Phase 6 — Cross-cutting
 
-- [ ] Configuration per environment (`appsettings.*.json` + environment variables); `.env.example` complete
-- [ ] Dashboard queries tested with seeded data
-- [ ] Seed script with ~50 realistic NCRs across states for the demo
-- [ ] Multi-stage `Dockerfile` for Api (serves built `web/` as static files) and full `docker compose up` run
-- [ ] `docs/adr/0003-time-and-user-passed-into-the-domain.md`
-- [ ] Redis in `docker-compose.yml`; cache dashboard results with `IDistributedCache` (cache-aside, 60 s TTL, invalidated when an NCR changes status); falls back to the database if Redis is down
-- [ ] OpenTelemetry tracing and metrics for API + EF Core; request duration visible locally
+- [x] Configuration per environment (`appsettings.*.json` + environment variables); `.env.example` complete (`Database:MigrateOnStartup` and `DemoData:Seed` replace the "Development only" checks, so the container and a deployment opt in by environment variable)
+- [x] Seed script with ~50 realistic NCRs across states for the demo (`DemoData/`: 50 NCRs built through the aggregate with past audit stamps, seeded into an empty database where `DemoData:Seed` is on)
+- [x] Multi-stage `Dockerfile` for Api (serves built `web/` as static files) and full `docker compose up` run (https://localhost:8443 through a Caddy proxy that ends TLS, as the production ingress does; session keys and photos on a volume)
+- [x] `docs/adr/0003-time-and-user-passed-into-the-domain.md`
+- [x] OpenTelemetry tracing and metrics for API + EF Core; request duration visible locally (SQL spans come from Npgsql's own tracing, which sees every command EF Core sends: the EF Core instrumentation package is still a beta; Aspire Dashboard at http://localhost:18888 in docker compose)
 
 **Done when:** `docker compose up` starts a working app from a clean clone; the dashboard still loads with Redis stopped; API traces and request durations are visible locally.
 
@@ -240,10 +268,10 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 
 ## Phase 7 — Quality pass
 
-- [ ] Raise `AnalysisLevel` to `latest-recommended`; fix (don't suppress) findings
-- [ ] Coverage report in CI (coverlet); Domain ≥ 95 % line coverage, Application ≥ 85 %
-- [ ] Review every file against the clean code checklist; list smells found and fixed in `docs/devlog.md`
-- [ ] Remove dead code, unused packages, TODOs without issues
+- [x] Raise `AnalysisLevel` to `latest-recommended`; fix (don't suppress) findings (CA1716, CA1000, CA1725, CA1711: four renames and one removal, listed in `docs/devlog.md`)
+- [x] Coverage report in CI (coverlet); Domain ≥ 95 % line coverage, Application ≥ 85 % (`scripts/check_coverage.py` merges the three test projects' reports and fails the `api` job below either line; measured 98.8 % and 99.1 %)
+- [x] Review every file against the clean code checklist; list smells found and fixed in `docs/devlog.md`
+- [x] Remove dead code, unused packages, TODOs without issues (one unused method removed; no unused packages or TODOs found)
 
 **Done when:** zero warnings at the higher level; coverage thresholds enforced in CI.
 
@@ -251,12 +279,17 @@ Goal: use cases as small handlers; no framework dependencies beyond `Microsoft.E
 
 ## Phase 8 — Ship and tell
 
-- [ ] Deploy to Azure Container Apps with managed PostgreSQL; secrets in app settings, not the repo
-- [ ] CD workflow on tag `v*`
-- [ ] README per the guide: pitch, live link, CI badge, demo GIF/video, problem, state diagram, rules, architecture, ADR links, how to run, testing, what's next
+> Status, 2026-11-10: everything that needs no cloud account is written and merged; nothing is deployed
+> (owner's decision, to keep Azure credit until the demo is needed). A box is ticked only once it has been
+> seen working, so the ones below stay open. To finish: follow `infra/README.md` ("First deployment"), then
+> tick each box as it is verified.
+
+- [ ] Deploy to Azure Container Apps with managed PostgreSQL; secrets in app settings, not the repo (ready, not run: `infra/provision.sh`)
+- [ ] CD workflow on tag `v*` (ready, not run: `.github/workflows/cd.yml`)
+- [ ] README per the guide: pitch, live link, CI badge, demo GIF/video, problem, state diagram, rules, architecture, ADR links, how to run, testing, what's next (all written, with screenshots; the live link and a demo video wait for the deployment)
 - [ ] Tag `v1.0.0` with release notes
 - [ ] (Stretch) Terraform for all Azure resources in `infra/`; `terraform plan` runs in CI on pull requests
-- [ ] Uptime check on `/health` with an alert email
+- [ ] Uptime check on `/health` with an alert email (ready, idle until the `APP_URL` variable is set: `.github/workflows/uptime.yml`)
 - [ ] `docs/learning/cloud-mapping.md`: owner's notes mapping each Azure resource used to its AWS equivalent
 
 **Done when:** PRD §10 success criteria are all met; the `/health` uptime alert is live. The Terraform stretch task is not required.
