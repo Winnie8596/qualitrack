@@ -30,7 +30,22 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Test
-        run: dotnet test --configuration Release --no-build
+        run: >-
+          dotnet test --configuration Release --no-build
+          --settings coverage.runsettings --collect:"XPlat Code Coverage" --results-directory coverage
+
+      # The rules live in Domain and the use cases in Application, so those two carry a minimum. The table goes
+      # to the job summary; the step fails the build when either is below its line.
+      - name: Check coverage
+        run: python3 scripts/check_coverage.py coverage QualiTrack.Domain=95 QualiTrack.Application=85
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/**/coverage.cobertura.xml
+          retention-days: 7
 
       - name: Check formatting
         run: dotnet format --verify-no-changes --no-restore

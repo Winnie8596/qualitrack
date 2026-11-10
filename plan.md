@@ -268,8 +268,8 @@ Goal: each slice leaves one more user story working end to end. Do them in order
 
 ## Phase 7 — Quality pass
 
-- [ ] Raise `AnalysisLevel` to `latest-recommended`; fix (don't suppress) findings
-- [ ] Coverage report in CI (coverlet); Domain ≥ 95 % line coverage, Application ≥ 85 %
+- [x] Raise `AnalysisLevel` to `latest-recommended`; fix (don't suppress) findings (CA1716, CA1000, CA1725, CA1711: four renames and one removal, listed in `docs/devlog.md`)
+- [x] Coverage report in CI (coverlet); Domain ≥ 95 % line coverage, Application ≥ 85 % (`scripts/check_coverage.py` merges the three test projects' reports and fails the `api` job below either line; measured 98.8 % and 99.1 %)
 - [ ] Review every file against the clean code checklist; list smells found and fixed in `docs/devlog.md`
 - [ ] Remove dead code, unused packages, TODOs without issues
 
