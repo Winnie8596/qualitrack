@@ -1,0 +1,26 @@
+name: Uptime
+
+# Asks the deployed app's /health every 15 minutes. A failed run emails the repository owner (GitHub's
+# notification for a failed scheduled workflow), which is the alert. Does nothing until the repository
+# variable APP_URL is set to the deployment's address.
+#
+# Limits worth knowing: GitHub may start a scheduled run several minutes late, and it pauses schedules in a
+# repository with no activity for 60 days. A paid monitor (Azure Monitor availability tests) has neither limit.
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    if: vars.APP_URL != ''
+    steps:
+      # Three tries, 20 s apart: one slow answer is not an outage. /health answers 200 "Healthy" when the app is up.
+      - name: Check /health
+        run: >-
+          curl --fail --silent --show-error --max-time 20
+          --retry 3 --retry-delay 20 --retry-all-errors
+          "${{ vars.APP_URL }}/health"
