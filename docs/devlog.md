@@ -2,6 +2,33 @@
 
 What happened in each phase, what was decided, and what was learned. Newest phase first.
 
+## Phase 8 — Ship and tell (prepared, not deployed)
+
+**Built**
+
+- `cd.yml`: a `v*` tag builds the image, pushes it to GitHub Container Registry and updates the
+  Azure Container App, signing in to Azure with GitHub's identity token (OIDC) rather than a secret.
+- `uptime.yml`: `/health` every 15 minutes; a failed run is the alert email.
+- `infra/provision.sh` and `infra/README.md`: the Azure resources, what they cost and how to delete them.
+- The README: pitch, screenshots, lifecycle and architecture diagrams, rules, decisions, how to run
+  and test.
+
+**Decisions**
+
+- **Not deployed yet.** The resources cost roughly US$25–30 a month of student credit, so they will
+  be created when the demo is needed. The plan's boxes stay open: none of this has run against Azure.
+- **GitHub Container Registry, not Azure Container Registry:** free for a public repository, and
+  the workflow's own token can push to it.
+- **No Redis and one replica in Azure.** The app already caches in memory when no Redis is
+  configured; a managed Redis would cost more than the rest together.
+- **A script, not Terraform**, for now: Terraform is the plan's stretch task.
+
+**Learned**
+
+- A screenshot is a test. The README's picture of an NCR showed "User 01a1c471" as both the
+  inspector and the investigator: .NET's new GUIDs are ordered by time, so users created together
+  share their first characters. The audit trail now shows the end of the id.
+
 ## Phase 7 — Quality pass
 
 **Built**

@@ -279,12 +279,17 @@ Goal: each slice leaves one more user story working end to end. Do them in order
 
 ## Phase 8 — Ship and tell
 
-- [ ] Deploy to Azure Container Apps with managed PostgreSQL; secrets in app settings, not the repo
-- [ ] CD workflow on tag `v*`
-- [ ] README per the guide: pitch, live link, CI badge, demo GIF/video, problem, state diagram, rules, architecture, ADR links, how to run, testing, what's next
+> Status, 2026-11-10: everything that needs no cloud account is written and merged; nothing is deployed
+> (owner's decision, to keep Azure credit until the demo is needed). A box is ticked only once it has been
+> seen working, so the ones below stay open. To finish: follow `infra/README.md` ("First deployment"), then
+> tick each box as it is verified.
+
+- [ ] Deploy to Azure Container Apps with managed PostgreSQL; secrets in app settings, not the repo (ready, not run: `infra/provision.sh`)
+- [ ] CD workflow on tag `v*` (ready, not run: `.github/workflows/cd.yml`)
+- [ ] README per the guide: pitch, live link, CI badge, demo GIF/video, problem, state diagram, rules, architecture, ADR links, how to run, testing, what's next (all written, with screenshots; the live link and a demo video wait for the deployment)
 - [ ] Tag `v1.0.0` with release notes
 - [ ] (Stretch) Terraform for all Azure resources in `infra/`; `terraform plan` runs in CI on pull requests
-- [ ] Uptime check on `/health` with an alert email
+- [ ] Uptime check on `/health` with an alert email (ready, idle until the `APP_URL` variable is set: `.github/workflows/uptime.yml`)
 - [ ] `docs/learning/cloud-mapping.md`: owner's notes mapping each Azure resource used to its AWS equivalent
 
 **Done when:** PRD §10 success criteria are all met; the `/health` uptime alert is live. The Terraform stretch task is not required.
