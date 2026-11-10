@@ -5,6 +5,7 @@ using QualiTrack.Api.Dashboard;
 using QualiTrack.Api.DemoData;
 using QualiTrack.Api.Http;
 using QualiTrack.Api.Ncrs;
+using QualiTrack.Api.Observability;
 using QualiTrack.Api.Users;
 using QualiTrack.Infrastructure;
 
@@ -36,6 +37,7 @@ builder.Services.AddHttpLogging(options =>
         | HttpLoggingFields.ResponseStatusCode | HttpLoggingFields.Duration;
     options.CombineLogs = true;
 });
+builder.Services.AddTelemetry(builder.Configuration);
 builder.Services.AddPersistence(connectionString);
 
 // Optional: without it the dashboard caches in memory (see AddDashboard). Not a secret, so it may live in appsettings.

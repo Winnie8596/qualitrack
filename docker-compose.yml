@@ -16,6 +16,8 @@ services:
         condition: service_healthy
       cache:
         condition: service_started
+      telemetry:
+        condition: service_started
     environment:
       # Inside the compose network the database is "db" on its own port, whatever POSTGRES_PORT maps it to outside
       ConnectionStrings__QualiTrack: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
@@ -26,6 +28,8 @@ services:
       DemoUsers__Inspector: ${DemoUsers__Inspector:?set DemoUsers__Inspector in .env}
       DemoUsers__Investigator: ${DemoUsers__Investigator:?set DemoUsers__Investigator in .env}
       DemoUsers__QaManager: ${DemoUsers__QaManager:?set DemoUsers__QaManager in .env}
+      # Traces, metrics and logs go to the viewer below over OTLP
+      OTEL_EXPORTER_OTLP_ENDPOINT: http://telemetry:18889
     volumes:
       # Photos and the session cookie's keys outlive the container
       - app-data:/data
@@ -43,6 +47,20 @@ services:
       - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
       # Caddy's local certificate authority, kept so the certificate stays the same between runs
       - proxy-data:/data
+
+  # Where the app's telemetry can be looked at locally: the Aspire Dashboard, a standalone OpenTelemetry viewer.
+  # Open http://localhost:18888 for traces (each request and its SQL), metrics (request duration) and logs.
+  # It keeps everything in memory and forgets it on restart. Production would send the same OTLP to a real backend.
+  telemetry:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:9.5
+    restart: unless-stopped
+    environment:
+      # No login token: it is bound to localhost and holds only this demo's telemetry
+      DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS: "true"
+    ports:
+      - "127.0.0.1:${TELEMETRY_PORT:-18888}:18888"
+      # OTLP over gRPC, for an API started with `dotnet run` (see .env.example)
+      - "127.0.0.1:4317:18889"
 
   db:
     image: postgres:17-alpine
