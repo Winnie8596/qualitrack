@@ -3,7 +3,7 @@ using QualiTrack.Application.Abstractions;
 
 namespace QualiTrack.Api.Authentication;
 
-/// <summary>One user per role, so every step of the lifecycle can be tried locally. Development only; see Program.</summary>
+/// <summary>One user per role, so every step of the lifecycle can be tried. Only where DemoData:Seed is on; see Program.</summary>
 public static class DemoUsers
 {
     private const string Section = "DemoUsers";

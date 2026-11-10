@@ -55,9 +55,17 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
+}
 
-    // Convenient locally; in production, migrations are a deliberate deployment step, not a side effect of startup
+// Both are off unless configuration turns them on, as appsettings.Development.json and docker-compose.yml do.
+// A production deployment that leaves them off migrates as a deliberate step and has no demo accounts.
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+{
     await app.Services.MigrateDatabaseAsync();
+}
+
+if (app.Configuration.GetValue<bool>("DemoData:Seed"))
+{
     await app.Services.SeedDemoUsersAsync();
 }
 

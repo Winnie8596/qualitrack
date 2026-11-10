@@ -56,7 +56,7 @@ public static class DependencyInjection
                 provider.GetRequiredService<DatabaseDashboardReader>(), provider.GetRequiredService<DashboardCache>()));
     }
 
-    /// <summary>Applies any migrations the database has not had yet. Development only; see Program.</summary>
+    /// <summary>Applies any migrations the database has not had yet. Only where Database:MigrateOnStartup is on; see Program.</summary>
     public static async Task MigrateDatabaseAsync(this IServiceProvider services)
     {
         await using var scope = services.CreateAsyncScope();
