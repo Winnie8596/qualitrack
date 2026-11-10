@@ -45,6 +45,7 @@ builder.Services.AddDashboard(builder.Configuration.GetConnectionString("Redis")
 builder.Services.AddFileStore(Path.Combine(
     builder.Environment.ContentRootPath, builder.Configuration["FileStore:Root"] ?? "App_Data/photos"));
 builder.Services.AddCookieAuthentication();
+builder.Services.AddSessionKeys(builder.Configuration);
 builder.Services.AddLoginRateLimit(builder.Configuration);
 builder.Services.AddAntiforgeryProtection();
 builder.Services.AddNcrUseCases();

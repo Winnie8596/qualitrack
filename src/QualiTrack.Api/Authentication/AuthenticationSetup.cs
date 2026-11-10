@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using QualiTrack.Application.Abstractions;
 using QualiTrack.Infrastructure.Persistence;
@@ -33,6 +34,24 @@ public static class AuthenticationSetup
             options.Events.OnRedirectToLogin = context => RespondWith(context, StatusCodes.Status401Unauthorized);
             options.Events.OnRedirectToAccessDenied = context => RespondWith(context, StatusCodes.Status403Forbidden);
         });
+
+        return services;
+    }
+
+    /// <summary>
+    /// Keeps the keys that encrypt the session cookie and the antiforgery token in a folder that outlives the
+    /// process, when DataProtection:KeysPath names one (a mounted volume in Docker). Without it the framework's
+    /// default applies: fine on a developer's machine, but a new container would start with new keys and every
+    /// signed-in user would be signed out.
+    /// </summary>
+    public static IServiceCollection AddSessionKeys(this IServiceCollection services, IConfiguration configuration)
+    {
+        var dataProtection = services.AddDataProtection();
+        var keysPath = configuration["DataProtection:KeysPath"];
+        if (!string.IsNullOrWhiteSpace(keysPath))
+        {
+            dataProtection.PersistKeysToFileSystem(new DirectoryInfo(keysPath));
+        }
 
         return services;
     }
