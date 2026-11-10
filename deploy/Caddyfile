@@ -1,0 +1,6 @@
+# Local stand-in for the TLS-terminating ingress the app sits behind in production.
+# Caddy issues itself a certificate for localhost from its own local authority, so the browser warns once
+# that it does not know the issuer. The session cookie is Secure, which is why plain HTTP is not offered.
+localhost {
+	reverse_proxy app:8080
+}

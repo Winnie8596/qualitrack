@@ -1,7 +1,49 @@
-# Local development services. Credentials come from .env (copy .env.example to .env).
+# The whole app on one machine: `docker compose up` builds the image and serves https://localhost:8443.
+# For development against `dotnet run` and the Vite dev server, start only what they need:
+#   docker compose up -d db cache
+# Credentials come from .env (copy .env.example to .env).
 name: qualitrack
 
 services:
+  # The API and the built web app in one container (see Dockerfile). Not published to the host: its session
+  # cookie needs HTTPS, so the only way in is the proxy below.
+  app:
+    build: .
+    image: qualitrack:local
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      cache:
+        condition: service_started
+    environment:
+      # Inside the compose network the database is "db" on its own port, whatever POSTGRES_PORT maps it to outside
+      ConnectionStrings__QualiTrack: Host=db;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      ConnectionStrings__Redis: cache:6379
+      # A demo: bring the database up to date and fill it on start. A real deployment leaves both off.
+      Database__MigrateOnStartup: "true"
+      DemoData__Seed: "true"
+      DemoUsers__Inspector: ${DemoUsers__Inspector:?set DemoUsers__Inspector in .env}
+      DemoUsers__Investigator: ${DemoUsers__Investigator:?set DemoUsers__Investigator in .env}
+      DemoUsers__QaManager: ${DemoUsers__QaManager:?set DemoUsers__QaManager in .env}
+    volumes:
+      # Photos and the session cookie's keys outlive the container
+      - app-data:/data
+
+  # Ends TLS in front of the app, as the ingress does in production (see deploy/Caddyfile)
+  proxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    depends_on:
+      - app
+    ports:
+      # Bound to localhost only, like the database
+      - "127.0.0.1:${APP_PORT:-8443}:443"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Caddy's local certificate authority, kept so the certificate stays the same between runs
+      - proxy-data:/data
+
   db:
     image: postgres:17-alpine
     restart: unless-stopped
@@ -36,3 +78,5 @@ services:
 
 volumes:
   postgres-data:
+  app-data:
+  proxy-data:
