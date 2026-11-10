@@ -256,11 +256,11 @@ Goal: each slice leaves one more user story working end to end. Do them in order
 
 ## Phase 6 — Cross-cutting
 
-- [ ] Configuration per environment (`appsettings.*.json` + environment variables); `.env.example` complete
+- [x] Configuration per environment (`appsettings.*.json` + environment variables); `.env.example` complete (`Database:MigrateOnStartup` and `DemoData:Seed` replace the "Development only" checks, so the container and a deployment opt in by environment variable)
 - [x] Seed script with ~50 realistic NCRs across states for the demo (`DemoData/`: 50 NCRs built through the aggregate with past audit stamps, seeded into an empty database where `DemoData:Seed` is on)
-- [ ] Multi-stage `Dockerfile` for Api (serves built `web/` as static files) and full `docker compose up` run
-- [ ] `docs/adr/0003-time-and-user-passed-into-the-domain.md`
-- [ ] OpenTelemetry tracing and metrics for API + EF Core; request duration visible locally
+- [x] Multi-stage `Dockerfile` for Api (serves built `web/` as static files) and full `docker compose up` run (https://localhost:8443 through a Caddy proxy that ends TLS, as the production ingress does; session keys and photos on a volume)
+- [x] `docs/adr/0003-time-and-user-passed-into-the-domain.md`
+- [x] OpenTelemetry tracing and metrics for API + EF Core; request duration visible locally (SQL spans come from Npgsql's own tracing, which sees every command EF Core sends: the EF Core instrumentation package is still a beta; Aspire Dashboard at http://localhost:18888 in docker compose)
 
 **Done when:** `docker compose up` starts a working app from a clean clone; the dashboard still loads with Redis stopped; API traces and request durations are visible locally.
 

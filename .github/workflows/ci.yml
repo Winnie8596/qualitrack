@@ -61,6 +61,15 @@ jobs:
       - name: Build
         run: npm run build
 
+  # The image `docker compose up` and the deployment run: a change that breaks the Dockerfile fails here
+  image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Build image
+        run: docker build --tag qualitrack:ci .
+
   # The browser smoke test (plan.md S5): the real API and web app against a real database, in Chromium
   e2e:
     runs-on: ubuntu-latest

@@ -2,7 +2,50 @@
 
 What happened in each phase, what was decided, and what was learned. Newest phase first.
 
-## Phase 0 — Walking skeleton (in progress)
+## Phase 6 — Cross-cutting
+
+**Built**
+
+- One Docker image for the whole app: a multi-stage `Dockerfile` builds the React app and the API
+  separately, and the API serves the built page from its web root. `docker compose up` runs it with
+  PostgreSQL, Redis, a Caddy proxy for HTTPS and the Aspire Dashboard for telemetry.
+- Startup behaviour by configuration (`Database:MigrateOnStartup`, `DemoData:Seed`) instead of by
+  environment name; `.env.example` covers both ways of running.
+- A demo seed of 50 NCRs across every status, built through the aggregate's own methods with past
+  audit stamps.
+- OpenTelemetry: a trace per API request with a span per SQL command, request-duration and
+  connection-pool metrics, exported over OTLP where an endpoint is configured.
+- [ADR 0003](adr/0003-time-and-user-passed-into-the-domain.md).
+
+**Decisions**
+
+- **HTTPS even locally.** The session cookie is `Secure` and antiforgery refuses plain HTTP, so the
+  container is not published on an HTTP port. A proxy ends TLS in front of it and passes the
+  original scheme in `X-Forwarded-Proto`, which is exactly what the Container Apps ingress will do.
+  The app trusts those headers only because nothing else can reach the container.
+- **Flags, not `IsDevelopment()`**, for migrating and seeding: the container runs as Production and
+  still needs both for a demo. A real deployment leaves them off.
+- **Npgsql's tracing rather than the EF Core instrumentation package**, which is still a beta. It
+  sits one layer lower and so sees every command EF Core sends. SQL text is recorded; parameter
+  values are not.
+- **Only `/api` requests are traced.** Health probes and static files would bury them.
+- **Session keys on a volume** (`DataProtection:KeysPath`): without it every new container signs
+  everyone out, because the cookie was encrypted with keys the old container took with it.
+
+**Learned**
+
+- Running the real image found what the dev server hid: Zod probes for `eval` with `new Function`,
+  which the Content-Security-Policy blocks, so every page logged a violation. The Vite dev server
+  sends no CSP. Fixed by building schemas in Zod's `jitless` mode.
+- Putting that setting "first" in `main.tsx` did not work: the bundler evaluates shared chunks
+  before the entry module's own code. Making every schema import `z` from one configured module
+  turns the ordering into a dependency the bundler must respect.
+- A request's trace span ends just *after* the client has its response. Tests that looked
+  immediately were flaky; they now wait for the span.
+- A new Docker volume takes its ownership from the folder it is mounted over, so the image creates
+  `/data` owned by the unprivileged user before switching to it.
+
+## Phase 0 — Walking skeleton
 
 **Built**
 

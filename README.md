@@ -5,26 +5,40 @@
 Track non-conformance reports (NCRs) and their corrective actions from report to verified close,
 with every change audited. Built with ASP.NET Core (.NET 10), PostgreSQL and React + TypeScript.
 
-> Work in progress: Phase 0 (walking skeleton). See [`plan.md`](plan.md) for the roadmap.
+> Work in progress: Phases 0–6 are done; quality pass and deployment remain. See [`plan.md`](plan.md).
 
-## Run locally
+## Run it
+
+Prerequisite: Docker.
+
+```bash
+cp .env.example .env    # then change the passwords
+docker compose up       # builds the image; first run takes a few minutes
+```
+
+- **App:** https://localhost:8443. The browser warns once about the certificate, which comes from
+  the local proxy's own authority. Sign in as `inspector@`, `investigator@` or
+  `qamanager@qualitrack.demo` with the passwords from `.env`. It starts with 50 demo NCRs.
+- **Traces, metrics and logs:** http://localhost:18888 (Aspire Dashboard).
+
+## Develop
 
 Prerequisites: .NET 10 SDK, Node.js 22, Docker.
 
 ```bash
-cp .env.example .env              # then change POSTGRES_PASSWORD
-docker compose up -d --wait       # PostgreSQL 17 on localhost:5432
-dotnet run --project src/QualiTrack.Api --launch-profile http    # API on http://localhost:5097
-cd web && npm ci && npm run dev   # web app on http://localhost:5173
+docker compose up -d db cache telemetry   # PostgreSQL, Redis and the telemetry viewer only
+# export the "dotnet run only" and "Demo users" variables from .env, then:
+dotnet run --project src/QualiTrack.Api --launch-profile https   # API on https://localhost:7178
+cd web && npm ci && npm run dev                                   # web app on http://localhost:5173
 ```
-
-The web page shows **API status: healthy** when it can reach the API.
 
 ## Test
 
 ```bash
-dotnet test
-cd web && npm run lint && npm run build
+dotnet test                       # unit and integration tests (integration needs Docker)
+cd web
+npm run lint && npm test && npm run build
+npm run e2e                       # Playwright; needs E2E_CONNECTION_STRING and E2E_DEMO_PASSWORD
 ```
 
 ## Docs
