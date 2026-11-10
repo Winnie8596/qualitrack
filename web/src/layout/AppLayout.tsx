@@ -69,11 +69,13 @@ function AppLayout() {
 
       {/* tabIndex -1 lets the skip link move keyboard focus here, not just scroll, in every browser.
           wrap-break-word: a long unbroken word someone typed (a part number, a URL) wraps instead of pushing
-          a phone-width page wide; a table still sizes to its content and scrolls inside its own box. */}
+          a phone-width page wide; a table still sizes to its content and scrolls inside its own box.
+          min-h-screen: the footer starts below the fold, so the page growing as data arrives never shoves a
+          visible footer down the screen (a layout shift, which Lighthouse scores and readers notice). */}
       <main
         id="main-content"
         tabIndex={-1}
-        className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 wrap-break-word focus:outline-hidden"
+        className="mx-auto min-h-screen w-full max-w-5xl flex-1 px-4 py-6 wrap-break-word focus:outline-hidden"
       >
         {/* While a page's chunk downloads (AppRoutes), the header and footer stay put */}
         <Suspense fallback={<p role="status">Loading the page…</p>}>
