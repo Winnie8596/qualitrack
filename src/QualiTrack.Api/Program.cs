@@ -82,6 +82,14 @@ app.UseExceptionHandler();
 app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
+
+// Only in a build that carries the web app (the Docker image); see WebApp
+var servesWebApp = app.HasWebApp();
+if (servesWebApp)
+{
+    app.UseWebAppFiles();
+}
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
@@ -91,5 +99,9 @@ app.MapAuthEndpoints();
 app.MapNcrEndpoints();
 app.MapUserEndpoints();
 app.MapDashboardEndpoints();
+if (servesWebApp)
+{
+    app.MapWebAppFallback();
+}
 
 await app.RunAsync();
