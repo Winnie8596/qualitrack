@@ -1,7 +1,7 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { useId } from 'react'
 import { Link, useSearchParams } from 'react-router'
-import { z } from 'zod'
+import { z } from '../api/zod.ts'
 import { ncrListQueryOptions, ncrStatusSchema, severitySchema } from '../api/ncrs.ts'
 import { fieldClass } from '../forms/fieldClass.ts'
 import FormAlert from '../forms/FormAlert.tsx'

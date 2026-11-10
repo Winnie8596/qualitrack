@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import { z } from 'zod'
+import { z } from './zod.ts'
 import { ApiError, getJson, postJsonWithoutAntiforgery, postWithoutAntiforgery } from './client.ts'
 
 // Matches the API's Role enum names, which /api/auth/me sends as text.

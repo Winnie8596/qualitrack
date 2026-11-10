@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { z } from 'zod'
+import { z } from './zod.ts'
 import { ApiError, forgetAntiforgeryToken, getJson, postJson } from './client.ts'
 
 const thing = z.object({ id: z.string() })

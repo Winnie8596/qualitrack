@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import { z } from 'zod'
+import { z } from './zod.ts'
 import { getJson } from './client.ts'
 
 const userSchema = z.object({ id: z.guid(), email: z.string() })

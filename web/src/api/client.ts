@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from './zod.ts'
 
 // RFC 9457, as the API sends it. Validation problems add `errors`, keyed by the JSON field name.
 export type ProblemDetails = {

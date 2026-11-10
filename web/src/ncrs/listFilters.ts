@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from '../api/zod.ts'
 import { ncrStatusSchema, severitySchema } from '../api/ncrs.ts'
 
 // The list's address and the API's query string are the same parameters (GET /api/ncrs, D1), so a filtered

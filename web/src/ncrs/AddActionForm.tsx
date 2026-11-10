@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useId } from 'react'
 import { useForm } from 'react-hook-form'
-import { z } from 'zod'
+import { z } from '../api/zod.ts'
 import { toFormErrors } from '../api/formErrors.ts'
 import { addCorrectiveAction } from '../api/ncrs.ts'
 import { primaryButtonClass } from '../forms/fieldClass.ts'

@@ -1,5 +1,5 @@
 import { queryOptions } from '@tanstack/react-query'
-import { z } from 'zod'
+import { z } from './zod.ts'
 import { getJson, postCommand, postFormCommand, postJson } from './client.ts'
 
 // The API sends enums by name (JsonStringEnumConverter), so these match the C# enums one for one.

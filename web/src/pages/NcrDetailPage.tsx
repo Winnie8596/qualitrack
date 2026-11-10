@@ -1,5 +1,5 @@
 import { useLocation, useParams } from 'react-router'
-import { z } from 'zod'
+import { z } from '../api/zod.ts'
 import { useAuth } from '../auth/useAuth.ts'
 import NcrDetail from '../ncrs/NcrDetail.tsx'
 import NcrNotFound from '../ncrs/NcrNotFound.tsx'
