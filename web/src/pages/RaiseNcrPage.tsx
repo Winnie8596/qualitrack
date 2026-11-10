@@ -5,7 +5,15 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router'
 import { z } from '../api/zod.ts'
 import { toFormErrors } from '../api/formErrors.ts'
-import { attachPhoto, maxPhotoBytes, photoTypes, raiseNcr, severitySchema, type RaiseNcrRequest } from '../api/ncrs.ts'
+import {
+  attachPhoto,
+  maxPhotoBytes,
+  maxPhotoSize,
+  photoTypes,
+  raiseNcr,
+  severitySchema,
+  type RaiseNcrRequest,
+} from '../api/ncrs.ts'
 import { primaryButtonClass } from '../forms/fieldClass.ts'
 import FileField from '../forms/FileField.tsx'
 import FormAlert from '../forms/FormAlert.tsx'
@@ -24,7 +32,7 @@ const raiseSchema = z.object({
     .optional()
     .transform((files) => files?.item(0) ?? undefined)
     .refine((file) => !file || photoTypes.some((type) => type === file.type), 'Choose a JPEG or PNG image.')
-    .refine((file) => !file || file.size <= maxPhotoBytes, 'Choose a photo of 5 MB or less.'),
+    .refine((file) => !file || file.size <= maxPhotoBytes, `Choose a photo of ${maxPhotoSize} or less.`),
 })
 
 type RaiseForm = z.input<typeof raiseSchema>
@@ -108,7 +116,7 @@ function RaiseNcrPage() {
           label="Photo (optional)"
           registration={register('photo')}
           accept={photoTypes.join(',')}
-          hint="A JPEG or PNG image of 5 MB or less."
+          hint={`A JPEG or PNG image of ${maxPhotoSize} or less.`}
           error={errors.photo?.message}
         />
 

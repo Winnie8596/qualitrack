@@ -8,24 +8,26 @@ namespace QualiTrack.Infrastructure.Storage;
 /// </summary>
 public sealed class LocalFileStore(string root) : IFileStore
 {
-    public async Task<string> SaveAsync(Stream content, string fileName, CancellationToken cancellationToken)
+    // What Stream.CopyToAsync copies at a time, so each read from the request fills one write to disk
+    private const int BufferSize = 81920;
+
+    public async Task SaveAsync(Stream content, string key, CancellationToken cancellationToken)
     {
-        var path = PathOf(fileName);
+        var path = PathOf(key);
         Directory.CreateDirectory(root);
 
         // Written beside the target first, so a reader never sees half a file
         var partial = $"{path}.partial";
-        await using (var file = new FileStream(partial, FileMode.Create, FileAccess.Write, FileShare.None, 81920, useAsync: true))
+        await using (var file = new FileStream(partial, FileMode.Create, FileAccess.Write, FileShare.None, BufferSize, useAsync: true))
         {
             await content.CopyToAsync(file, cancellationToken);
         }
 
         File.Move(partial, path, overwrite: true);
-        return fileName;
     }
 
     public Task<Stream> OpenReadAsync(string key, CancellationToken cancellationToken) =>
-        Task.FromResult<Stream>(new FileStream(PathOf(key), FileMode.Open, FileAccess.Read, FileShare.Read, 81920, useAsync: true));
+        Task.FromResult<Stream>(new FileStream(PathOf(key), FileMode.Open, FileAccess.Read, FileShare.Read, BufferSize, useAsync: true));
 
     // Keys come from the application, never from a request, but a plain name is still checked: "../" must not
     // turn into a path outside the folder

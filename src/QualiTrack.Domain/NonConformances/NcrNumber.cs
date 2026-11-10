@@ -6,6 +6,9 @@ namespace QualiTrack.Domain.NonConformances;
 /// <summary>BR-9: unique per year, formatted NCR-YYYY-NNNN.</summary>
 public sealed partial record NcrNumber
 {
+    // Four digits each, which is what the format has room for
+    private const int MinYear = 1000;
+    private const int MaxYear = 9999;
     private const int MaxSequence = 9999;
 
     private NcrNumber(string value) => Value = value;
@@ -14,7 +17,7 @@ public sealed partial record NcrNumber
 
     public static NcrNumber From(int year, int sequence)
     {
-        if (year is < 1000 or > 9999)
+        if (year is < MinYear or > MaxYear)
         {
             throw DomainException.InvalidInput("NCR year must have four digits.");
         }

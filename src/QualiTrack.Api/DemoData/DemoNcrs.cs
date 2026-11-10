@@ -26,7 +26,8 @@ public static class DemoNcrs
             return;
         }
 
-        var cast = await DemoCastAsync(scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<Guid>>>());
+        var builder = new DemoNcrBuilder(
+            await DemoCastAsync(scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser<Guid>>>()));
         var numbers = scope.ServiceProvider.GetRequiredService<INcrNumberGenerator>();
         var now = scope.ServiceProvider.GetRequiredService<IClock>().UtcNow;
         var catalogue = DemoNcrCatalogue.All;
@@ -35,7 +36,7 @@ public static class DemoNcrs
         {
             var raisedAt = now - _ageOfNewest - TimeSpan.FromDays(catalogue.Count - 1 - index);
             var number = await numbers.NextAsync(raisedAt.Year, cancellationToken);
-            repository.Add(DemoNcrBuilder.Build(catalogue[index], number, raisedAt, cast));
+            repository.Add(builder.Build(catalogue[index], number, raisedAt));
         }
 
         // One transaction: the demo gets every NCR or none

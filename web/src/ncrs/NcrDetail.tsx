@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import type { CurrentUser } from '../api/auth.ts'
 import { ApiError } from '../api/client.ts'
-import { ncrQueryOptions, photoUrl } from '../api/ncrs.ts'
+import { maxPhotoSize, ncrQueryOptions, photoUrl } from '../api/ncrs.ts'
 import FormAlert from '../forms/FormAlert.tsx'
 import CorrectiveActions from './CorrectiveActions.tsx'
 import DateTime from './DateTime.tsx'
@@ -46,7 +46,7 @@ function NcrDetail({ id, currentUser, photoNotAttached = false }: NcrDetailProps
         {ncr.number}: {ncr.title}
       </h1>
       {photoNotAttached && (
-        <FormAlert message="The NCR was raised, but its photo could not be attached. Check it is a JPEG or PNG of 5 MB or less." />
+        <FormAlert message={`The NCR was raised, but its photo could not be attached. Check it is a JPEG or PNG of ${maxPhotoSize} or less.`} />
       )}
 
       <section aria-labelledby="ncr-details">

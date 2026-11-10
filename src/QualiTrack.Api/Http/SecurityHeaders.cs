@@ -6,8 +6,8 @@ namespace QualiTrack.Api.Http;
 /// </summary>
 public static class SecurityHeaders
 {
-    // Only this origin may supply scripts, styles and data, which suits the JSON API now and the built web app
-    // it will serve later (Phase 6); no plugins, no <base> rewriting, and no page may frame this one (clickjacking)
+    // Only this origin may supply scripts, styles and data, which suits both the JSON API and the built web app
+    // it serves (see WebApp); no plugins, no <base> rewriting, and no page may frame this one (clickjacking)
     private const string ContentSecurityPolicy =
         "default-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'";
 

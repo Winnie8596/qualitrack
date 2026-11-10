@@ -6,7 +6,9 @@ namespace QualiTrack.Domain.NonConformances;
 /// </summary>
 public sealed class PhotoFormat
 {
-    public const int MaxLength = 5 * 1024 * 1024;
+    private const int MaxMegabytes = 5;
+
+    public const int MaxLength = MaxMegabytes * 1024 * 1024;
 
     /// <summary>How many leading bytes <see cref="Recognise"/> needs to see.</summary>
     public const int SignatureLength = 8;
@@ -37,7 +39,7 @@ public sealed class PhotoFormat
     {
         if (length > MaxLength)
         {
-            throw DomainException.InvalidInput("A photo can be at most 5 MB.");
+            throw DomainException.InvalidInput($"A photo can be at most {MaxMegabytes} MB.");
         }
 
         foreach (var format in _all)

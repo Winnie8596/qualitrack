@@ -12,8 +12,8 @@ public sealed class LocalFileStoreTests : IDisposable
         var store = new LocalFileStore(_root);
         byte[] content = [1, 2, 3, 4, 5];
 
-        var key = await store.SaveAsync(new MemoryStream(content), "photo.png", CancellationToken.None);
-        await using var read = await store.OpenReadAsync(key, CancellationToken.None);
+        await store.SaveAsync(new MemoryStream(content), "photo.png", CancellationToken.None);
+        await using var read = await store.OpenReadAsync("photo.png", CancellationToken.None);
 
         using var copy = new MemoryStream();
         await read.CopyToAsync(copy);

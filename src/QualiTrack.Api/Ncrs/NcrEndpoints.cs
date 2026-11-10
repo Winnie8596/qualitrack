@@ -70,7 +70,7 @@ public sealed record ListNcrsRequest(
     }
 }
 
-/// <summary>Raise an NCR and open one (A1, D2). Which role may do either is decided by the handler.</summary>
+/// <summary>Every NCR endpoint: the list, one NCR, and each step of its lifecycle. Which role may call each is decided by its handler.</summary>
 public static class NcrEndpoints
 {
     // The photo's 5 MB (checked by the domain) and room for the multipart headers; anything bigger is refused

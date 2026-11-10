@@ -8,12 +8,11 @@ internal sealed class InMemoryFileStore : IFileStore
 
     public IReadOnlyDictionary<string, byte[]> Files => _files;
 
-    public async Task<string> SaveAsync(Stream content, string fileName, CancellationToken cancellationToken)
+    public async Task SaveAsync(Stream content, string key, CancellationToken cancellationToken)
     {
         using var copy = new MemoryStream();
         await content.CopyToAsync(copy, cancellationToken);
-        _files[fileName] = copy.ToArray();
-        return fileName;
+        _files[key] = copy.ToArray();
     }
 
     public Task<Stream> OpenReadAsync(string key, CancellationToken cancellationToken) =>

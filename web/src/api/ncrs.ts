@@ -167,7 +167,10 @@ export function rejectVerification(id: string, reason: string): Promise<void> {
 
 // A1: what the API accepts as a photo; it checks the file's own bytes again
 export const photoTypes = ['image/jpeg', 'image/png'] as const
-export const maxPhotoBytes = 5 * 1024 * 1024
+const maxPhotoMegabytes = 5
+export const maxPhotoBytes = maxPhotoMegabytes * 1024 * 1024
+/** The limit in words, for the hint and the error messages. */
+export const maxPhotoSize = `${maxPhotoMegabytes} MB`
 
 /** A1: the NCR's one optional photo, attached by the inspector who raised it. */
 export function attachPhoto(id: string, photo: File): Promise<void> {
