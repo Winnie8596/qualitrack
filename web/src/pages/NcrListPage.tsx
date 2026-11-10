@@ -141,7 +141,8 @@ function NcrListPage() {
                       {ncr.number}
                     </Link>
                   </td>
-                  <td className="px-3 py-2">{ncr.title}</td>
+                  {/* Wraps even inside one long word, so a part-number title does not push the other columns away */}
+                  <td className="min-w-48 px-3 py-2 wrap-anywhere">{ncr.title}</td>
                   <td className="px-3 py-2">
                     <SeverityBadge severity={ncr.severity} />
                   </td>

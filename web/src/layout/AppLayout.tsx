@@ -67,11 +67,13 @@ function AppLayout() {
         </div>
       </header>
 
-      {/* tabIndex -1 lets the skip link move keyboard focus here, not just scroll, in every browser */}
+      {/* tabIndex -1 lets the skip link move keyboard focus here, not just scroll, in every browser.
+          wrap-break-word: a long unbroken word someone typed (a part number, a URL) wraps instead of pushing
+          a phone-width page wide; a table still sizes to its content and scrolls inside its own box. */}
       <main
         id="main-content"
         tabIndex={-1}
-        className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 focus:outline-hidden"
+        className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 wrap-break-word focus:outline-hidden"
       >
         {/* While a page's chunk downloads (AppRoutes), the header and footer stay put */}
         <Suspense fallback={<p role="status">Loading the page…</p>}>
