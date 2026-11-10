@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { NavLink, Outlet } from 'react-router'
 import { useAuth } from '../auth/useAuth.ts'
 import { roleLabels } from '../auth/roleLabels.ts'
@@ -72,7 +73,10 @@ function AppLayout() {
         tabIndex={-1}
         className="mx-auto w-full max-w-5xl flex-1 px-4 py-6 focus:outline-hidden"
       >
-        <Outlet />
+        {/* While a page's chunk downloads (AppRoutes), the header and footer stay put */}
+        <Suspense fallback={<p role="status">Loading the page…</p>}>
+          <Outlet />
+        </Suspense>
       </main>
 
       <footer className="border-t border-slate-200 bg-white">
