@@ -28,6 +28,12 @@ What happened in each phase, what was decided, and what was learned. Newest phas
   on a retry. A package pushed by a public repository's workflow is public from the start.
 - Idempotent steps paid off: a network timeout halfway cost nothing but a second run.
 
+**Then removed, the same day.** The owner chose not to spend student credit on an always-on demo, so
+`az group delete --name qualitrack-rg` took everything down after about two hours. The `APP_URL` and
+`AZURE_CLIENT_ID` variables were deleted with it, so the uptime check and the CD `deploy` job are
+idle again; the `qualitrack-github` app registration is kept (it costs nothing). The image
+`ghcr.io/winnie8596/qualitrack:v1.0.0` stays, and the script brings the demo back when it is needed.
+
 ## Phase 8 — Ship and tell (prepared, not deployed)
 
 **Built**
