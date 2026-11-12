@@ -38,8 +38,10 @@ if ! az postgres flexible-server show --name "$DATABASE_SERVER" --resource-group
     --name "$DATABASE_SERVER" --resource-group "$RESOURCE_GROUP" --location "$LOCATION" \
     --tier Burstable --sku-name Standard_B1ms --storage-size 32 --version 17 \
     --admin-user qualitrack --admin-password "$POSTGRES_ADMIN_PASSWORD" \
-    --database-name qualitrack --public-access 0.0.0.0 --yes --output none
+    --public-access 0.0.0.0 --yes --output none
 fi
+# Its own step: since Azure CLI 2.7x, `create --database-name` is for elastic clusters only
+az postgres flexible-server db create --server-name "$DATABASE_SERVER" --resource-group "$RESOURCE_GROUP"   --name qualitrack --output none
 DATABASE_HOST="$(az postgres flexible-server show --name "$DATABASE_SERVER" --resource-group "$RESOURCE_GROUP" \
   --query fullyQualifiedDomainName --output tsv)"
 
@@ -51,8 +53,24 @@ STORAGE_KEY="$(az storage account keys list --account-name "$STORAGE_ACCOUNT" --
 az storage share create --name "$SHARE" --account-name "$STORAGE_ACCOUNT" --account-key "$STORAGE_KEY" --output none
 
 echo "== Container Apps environment $ENVIRONMENT"
-az containerapp env create --name "$ENVIRONMENT" --resource-group "$RESOURCE_GROUP" --location "$LOCATION" \
-  --output none
+# Only when missing: creating it again would add a second Log Analytics workspace
+if ! az containerapp env show --name "$ENVIRONMENT" --resource-group "$RESOURCE_GROUP" --output none 2>/dev/null; then
+  az containerapp env create --name "$ENVIRONMENT" --resource-group "$RESOURCE_GROUP" --location "$LOCATION" \
+    --output none
+fi
+# Azure may create the environment in "express" mode, which cannot mount a file share
+# (ExpressEnvironmentResourceNotSupported). The mode is only visible, and changeable, through the REST API.
+# MSYS_NO_PATHCONV stops Git Bash on Windows rewriting the URL's path.
+ENVIRONMENT_URL="https://management.azure.com$(az containerapp env show --name "$ENVIRONMENT" \
+  --resource-group "$RESOURCE_GROUP" --query id --output tsv)?api-version=2026-07-01"
+environment_field() { MSYS_NO_PATHCONV=1 az rest --method get --url "$ENVIRONMENT_URL" --query "properties.$1" --output tsv; }
+if [ "$(environment_field environmentMode)" = "Express" ]; then
+  echo "   switching it from express to standard mode (this took about twenty minutes when first run)"
+  MSYS_NO_PATHCONV=1 az rest --method patch --url "$ENVIRONMENT_URL" \
+    --body '{"properties":{"environmentMode":"WorkloadProfiles"}}' --output none
+  sleep 60
+  until [ "$(environment_field provisioningState)" != "Updating" ]; do sleep 30; done
+fi
 az containerapp env storage set --name "$ENVIRONMENT" --resource-group "$RESOURCE_GROUP" \
   --storage-name "$SHARE" --access-mode ReadWrite \
   --azure-file-account-name "$STORAGE_ACCOUNT" --azure-file-account-key "$STORAGE_KEY" \

@@ -10,7 +10,9 @@ different person verifies it before it closes. Every step is recorded with who a
 Built with ASP.NET Core (.NET 10), PostgreSQL, Redis and React + TypeScript.
 
 <!-- LIVE-DEMO -->
-**Live demo:** not deployed yet. Run it locally with one command: see [Run it](#run-it).
+**Live demo:** not running at the moment. It ran on Azure Container Apps on 2026-11-12 and was then
+removed to save credit; [`infra/`](infra/) recreates it in about half an hour. Run it locally with
+one command: see [Run it](#run-it).
 <!-- /LIVE-DEMO -->
 
 ![The NCR list: fifty demo NCRs with severity, status and overdue badges](docs/images/ncr-list.png)

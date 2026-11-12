@@ -33,8 +33,9 @@ az group delete --name qualitrack-rg
 
 1. Push a tag so the image exists: `git tag v1.0.0 && git push origin v1.0.0`. The `image` job of
    [`cd.yml`](../.github/workflows/cd.yml) pushes `ghcr.io/<owner>/qualitrack:v1.0.0`.
-2. Make the image public so Azure can pull it without a password: on GitHub, your profile →
-   Packages → `qualitrack` → Package settings → Change visibility → Public.
+2. Check Azure can pull the image without a password. A package pushed by a workflow of a public
+   repository is public already. If it is not: on GitHub, your profile → Packages → `qualitrack` →
+   Package settings → Change visibility → Public.
 3. Create the resources (about ten minutes):
 
    ```bash
@@ -45,7 +46,9 @@ az group delete --name qualitrack-rg
    ```
 
    It prints the app's address. `LOCATION` defaults to `japaneast`; a subscription may restrict
-   which regions it can use.
+   which regions it can use. If Azure creates the environment in "express" mode, which cannot
+   mount the file share, the script switches it to standard mode; that alone took twenty minutes.
+   If a step fails on a network timeout, run the script again: it carries on where it stopped.
 4. Set the repository variable `APP_URL` to that address (Settings → Secrets and variables →
    Actions → Variables) so [`uptime.yml`](../.github/workflows/uptime.yml) starts checking it.
 
