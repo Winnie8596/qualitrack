@@ -10,7 +10,9 @@ different person verifies it before it closes. Every step is recorded with who a
 Built with ASP.NET Core (.NET 10), PostgreSQL, Redis and React + TypeScript.
 
 <!-- LIVE-DEMO -->
-**Live demo:** not deployed yet. Run it locally with one command: see [Run it](#run-it).
+**Live demo:** <https://qualitrack.bravesky-f3694f95.japaneast.azurecontainerapps.io> (Azure Container Apps). It holds 50 demo NCRs in every status;
+sign in as `inspector@qualitrack.demo`, `investigator@qualitrack.demo` or `qamanager@qualitrack.demo`.
+The demo password is given on request.
 <!-- /LIVE-DEMO -->
 
 ![The NCR list: fifty demo NCRs with severity, status and overdue badges](docs/images/ncr-list.png)

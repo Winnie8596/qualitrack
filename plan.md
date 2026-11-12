@@ -279,17 +279,16 @@ Goal: each slice leaves one more user story working end to end. Do them in order
 
 ## Phase 8 — Ship and tell
 
-> Status, 2026-11-10: everything that needs no cloud account is written and merged; nothing is deployed
-> (owner's decision, to keep Azure credit until the demo is needed). A box is ticked only once it has been
-> seen working, so the ones below stay open. To finish: follow `infra/README.md` ("First deployment"), then
-> tick each box as it is verified.
+> Status, 2026-11-12: deployed at https://qualitrack.bravesky-f3694f95.japaneast.azurecontainerapps.io
+> (resource group `qualitrack-rg`, japaneast). A box is ticked only once it has been seen working. Still open:
+> the demo video and the owner's two learning notes. `az group delete --name qualitrack-rg` stops the cost.
 
-- [ ] Deploy to Azure Container Apps with managed PostgreSQL; secrets in app settings, not the repo (ready, not run: `infra/provision.sh`)
+- [x] Deploy to Azure Container Apps with managed PostgreSQL; secrets in app settings, not the repo (`infra/provision.sh`, run 2026-11-12; `/health` answers, and `e2e/lifecycle.spec.ts` passes against the deployed app)
 - [ ] CD workflow on tag `v*` (ready, not run: `.github/workflows/cd.yml`)
-- [ ] README per the guide: pitch, live link, CI badge, demo GIF/video, problem, state diagram, rules, architecture, ADR links, how to run, testing, what's next (all written, with screenshots; the live link and a demo video wait for the deployment)
+- [ ] README per the guide: pitch, live link, CI badge, demo GIF/video, problem, state diagram, rules, architecture, ADR links, how to run, testing, what's next (all written, with screenshots and the live link; the demo video is still to record)
 - [ ] Tag `v1.0.0` with release notes
 - [ ] (Stretch) Terraform for all Azure resources in `infra/`; `terraform plan` runs in CI on pull requests
-- [ ] Uptime check on `/health` with an alert email (ready, idle until the `APP_URL` variable is set: `.github/workflows/uptime.yml`)
+- [x] Uptime check on `/health` with an alert email (`.github/workflows/uptime.yml`; `APP_URL` set and a run seen green 2026-11-12)
 - [ ] `docs/learning/cloud-mapping.md`: owner's notes mapping each Azure resource used to its AWS equivalent
 
 **Done when:** PRD §10 success criteria are all met; the `/health` uptime alert is live. The Terraform stretch task is not required.

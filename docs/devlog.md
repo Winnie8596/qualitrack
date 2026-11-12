@@ -2,6 +2,32 @@
 
 What happened in each phase, what was decided, and what was learned. Newest phase first.
 
+## Phase 8 — Ship and tell: the deployment (2026-11-12)
+
+**Done**
+
+- Tag `v1.0.0` built `ghcr.io/winnie8596/qualitrack:v1.0.0`; `infra/provision.sh` created the
+  resource group, PostgreSQL, the file share, the Container Apps environment and the app.
+- Live at <https://qualitrack.bravesky-f3694f95.japaneast.azurecontainerapps.io>. Checked: `/health`, the security headers, sign-in as each role, 401 without a
+  session, and the Playwright lifecycle test run against the deployed app.
+- GitHub can deploy without a stored secret: an app registration trusted for this repository's
+  `production` environment (OIDC), Contributor on the one resource group only.
+- `APP_URL` set, so the uptime check now runs for real.
+
+**Learned**
+
+- **A script that was never run is a draft.** Three things only running it could show:
+  the Azure CLI now keeps `create --database-name` for elastic clusters, so the database is its own
+  step; running `env create` twice made a second Log Analytics workspace, so it is now skipped when
+  the environment exists; and Azure created the environment in "express" mode, which cannot mount a
+  file share (`ExpressEnvironmentResourceNotSupported`).
+- The mode is invisible in the CLI and in the stable API: only a preview API version showed
+  `environmentMode: Express`. A PATCH to `WorkloadProfiles` converted it, in about twenty minutes.
+  This is not in Microsoft's documentation, so the script's handling of it may age.
+- The first image push failed with `denied` after every layer had uploaded; the same job passed
+  on a retry. A package pushed by a public repository's workflow is public from the start.
+- Idempotent steps paid off: a network timeout halfway cost nothing but a second run.
+
 ## Phase 8 — Ship and tell (prepared, not deployed)
 
 **Built**
